@@ -1,19 +1,21 @@
-import type { Metadata } from "next";
-import { Spectral } from "next/font/google";
-import "./globals.css";
-import {ReactNode} from "react";
+import { Providers } from '@/app/providers';
+import type { Metadata } from 'next';
+import { Spectral } from 'next/font/google';
+import { ReactNode } from 'react';
+import Box from '@mui/material/Box';
+import './globals.scss';
 
 const spectral = Spectral({
   weight: '400',
-  subsets: ["latin"],
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "Movie Night",
-  description: "For watchlists with friends!",
+  title: 'Movie Night',
+  description: 'For watchlists with friends!',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
@@ -21,7 +23,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${spectral.className}`}>
-        {children}
+        <Providers>
+          <Box sx={{ m: 2, display: 'flex' }}>
+            <a href="/">
+              <h1>🍿 Movie Night</h1>
+            </a>
+          </Box>
+          {children}
+        </Providers>
       </body>
     </html>
   );
