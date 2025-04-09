@@ -10,12 +10,13 @@ import {
   Box,
   Divider,
   IconButton,
+  ListItem,
   ListItemIcon,
   Menu,
   MenuItem,
 } from '@mui/material';
 
-const ProfileMenu = ({ displayName }: AuthPageProps) => {
+export const ProfileMenu = ({ displayName }: AuthPageProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -51,24 +52,28 @@ const ProfileMenu = ({ displayName }: AuthPageProps) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <PlaylistPlayIcon fontSize="small" />
-          </ListItemIcon>
-          My Lists
+        <MenuItem>
+          <Link href={'/'}>
+            <ListItem sx={{ py: 0, px: 1 }}>
+              <ListItemIcon>
+                <PlaylistPlayIcon fontSize="small" />
+              </ListItemIcon>
+              My Lists
+            </ListItem>
+          </Link>
         </MenuItem>
         <Divider />
-        <Link href={'/logout'}>
-          <MenuItem>
-            <ListItemIcon>
-              <Logout fontSize="small" />
-            </ListItemIcon>
-            Logout
-          </MenuItem>
-        </Link>
+        <MenuItem>
+          <Link href={'/logout'}>
+            <ListItem sx={{ py: 0, px: 1 }}>
+              <ListItemIcon>
+                <Logout fontSize="small" />
+              </ListItemIcon>
+              Logout
+            </ListItem>
+          </Link>
+        </MenuItem>
       </Menu>
     </>
   );
 };
-
-export default ProfileMenu;

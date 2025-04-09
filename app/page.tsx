@@ -1,9 +1,10 @@
-import { Auth } from '@/components/auth';
+import { Auth } from '@/components/Auth';
+import { Lists } from '@/components/Lists';
 import withAuth, { AuthPageProps } from '@/components/withAuth';
 
 async function Home({ authed }: AuthPageProps) {
   if (authed) {
-    return 'Profile';
+    return <Lists />;
   }
   return <Auth />;
 }

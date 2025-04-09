@@ -1,6 +1,6 @@
 import { Providers } from '@/app/providers';
-import ProfileMenu from '@/components/profileMenu';
-import withAuth, { AuthPageProps, getAuth } from '@/components/withAuth';
+import { ProfileMenu } from '@/components/ProfileMenu';
+import { getAuth } from '@/components/withAuth';
 import type { Metadata } from 'next';
 import { Spectral } from 'next/font/google';
 import Link from 'next/link';
