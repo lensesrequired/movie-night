@@ -13,6 +13,20 @@ export const cookieSettings = (env: string) => ({
   expires: new Date(new Date().setDate(new Date().getDate() + 1)),
 });
 
+export async function GET(request: NextRequest) {
+  const authCookie = request.cookies.get('auth');
+
+  if (authCookie?.value) {
+    const token = jwt.verify(
+      authCookie?.value,
+      process.env.JWT_SECRET as jwt.Secret,
+    );
+    return NextResponse.json(token);
+  }
+
+  return NextResponse.json({ authed: false }, { status: 401 });
+}
+
 export async function POST(request: NextRequest) {
   const { email, password } = await request.json();
 
@@ -36,12 +50,12 @@ export async function POST(request: NextRequest) {
     )
     .then(async (response) => {
       if (response.Item) {
-        const { password: savedPassword } = response.Item;
+        const { password: savedPassword, displayName } = response.Item;
         try {
           const match = bcrypt.compareSync(password, savedPassword.S || '');
           if (match) {
             const token = jwt.sign(
-              { authed: true, email },
+              { authed: true, email, displayName: displayName.S },
               process.env.JWT_SECRET as jwt.Secret,
               {
                 expiresIn: 60 * 60 * 24,

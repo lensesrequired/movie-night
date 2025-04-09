@@ -1,6 +1,7 @@
 import { Providers } from '@/app/providers';
 import type { Metadata } from 'next';
 import { Spectral } from 'next/font/google';
+import Link from 'next/link';
 import { ReactNode } from 'react';
 import Box from '@mui/material/Box';
 import './globals.scss';
@@ -25,9 +26,9 @@ export default async function RootLayout({
       <body className={`${spectral.className}`}>
         <Providers>
           <Box sx={{ m: 2, display: 'flex' }}>
-            <a href="/">
+            <Link href="/">
               <h1>🍿 Movie Night</h1>
-            </a>
+            </Link>
           </Box>
           {children}
         </Providers>

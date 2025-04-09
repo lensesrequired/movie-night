@@ -10,5 +10,5 @@ const theme = createTheme({
 });
 
 export function Providers({ children }: { children: ReactNode }) {
-  return <ThemeProvider theme={theme}> {children} </ThemeProvider>;
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }

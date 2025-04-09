@@ -51,13 +51,13 @@ export async function POST(request: NextRequest) {
                   PK: { S: `USER#${email}` },
                   SK: { S: '#PROFILE' },
                   password: { S: hashedPassword },
-                  journal: { L: [] },
+                  displayName: { S: email },
                 },
               }),
             ),
           );
           const token = jwt.sign(
-            { authed: true, email },
+            { authed: true, email, displayName: email },
             process.env.JWT_SECRET as jwt.Secret,
             {
               expiresIn: 60 * 60 * 24,
