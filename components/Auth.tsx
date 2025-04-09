@@ -1,5 +1,6 @@
 'use client';
 
+import { apiFetch } from '@/helpers/fetch';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Box, Button, TextField } from '@mui/material';
 
@@ -24,49 +25,19 @@ export const Auth = () => {
     }
   }, [emailError, isValid]);
 
-  const onLogin = () => {
+  const onLogin = (create?: boolean) => {
     setSubmitError('');
     if (isValid()) {
-      fetch('/api/authenticate', {
+      apiFetch(create ? '/api/user' : '/api/authenticate', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.authed) {
-            window.location.reload();
-          } else if (data._message) {
-            setSubmitError(data._message);
-          } else {
-            setSubmitError('Unknown error. Please try again.');
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
-
-  const onCreateAccount = () => {
-    setSubmitError('');
-    if (isValid()) {
-      fetch('/api/user', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.authed) {
-            window.location.reload();
-          } else if (data._message) {
-            setSubmitError(data._message);
-          } else {
-            setSubmitError('Unknown error. Please try again.');
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      }).then(({ ok, data, error }) => {
+        if (ok && data.authed) {
+          window.location.reload();
+        } else {
+          setSubmitError(error || 'Something went wrong. Please try again.');
+        }
+      });
     }
   };
 
@@ -103,14 +74,18 @@ export const Auth = () => {
         />
         <Button
           variant="contained"
-          onClick={onLogin}
+          onClick={() => {
+            onLogin();
+          }}
           disabled={!email || !password}
         >
           Login
         </Button>
         <Button
           variant="outlined"
-          onClick={onCreateAccount}
+          onClick={() => {
+            onLogin(true);
+          }}
           disabled={!email || !password}
         >
           Create Account
