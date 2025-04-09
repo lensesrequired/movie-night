@@ -15,7 +15,7 @@ export default function withAuth(Component: JSX.ElementType) {
     const auth = await fetch('http://localhost:3000/api/authenticate', {
       method: 'get',
       headers: {
-        Cookie: `auth=${authCookie?.value}`,
+        Cookie: `auth=${authCookie?.value || ''}`,
       },
     })
       .then((resp) => resp.json())

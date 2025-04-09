@@ -34,7 +34,7 @@ export const Auth = () => {
         .then((res) => res.json())
         .then((data) => {
           if (data.authed) {
-            console.log('redirect');
+            window.location.reload();
           } else if (data._message) {
             setSubmitError(data._message);
           } else {
@@ -57,7 +57,7 @@ export const Auth = () => {
         .then((res) => res.json())
         .then((data) => {
           if (data.authed) {
-            console.log('redirect');
+            window.location.reload();
           } else if (data._message) {
             setSubmitError(data._message);
           } else {

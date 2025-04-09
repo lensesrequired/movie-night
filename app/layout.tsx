@@ -1,4 +1,5 @@
 import { Providers } from '@/app/providers';
+import withAuth, { AuthPageProps } from '@/components/withAuth';
 import type { Metadata } from 'next';
 import { Spectral } from 'next/font/google';
 import Link from 'next/link';
@@ -16,11 +17,9 @@ export const metadata: Metadata = {
   description: 'For watchlists with friends!',
 };
 
-export default async function RootLayout({
+async function RootLayout({
   children,
-}: Readonly<{
-  children: ReactNode;
-}>) {
+}: Readonly<{ children: ReactNode }> & AuthPageProps) {
   return (
     <html lang="en">
       <body className={`${spectral.className}`}>
@@ -36,3 +35,5 @@ export default async function RootLayout({
     </html>
   );
 }
+
+export default withAuth(RootLayout);
