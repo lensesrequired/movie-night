@@ -7,19 +7,23 @@ export type AuthPageProps = {
   displayName: string;
 };
 
+export const getAuth = async (): Promise<AuthPageProps> => {
+  const cookieStore = await cookies();
+  const authCookie = cookieStore.get('auth');
+
+  return await fetch('http://localhost:3000/api/authenticate', {
+    method: 'get',
+    headers: {
+      Cookie: `auth=${authCookie?.value || ''}`,
+    },
+  })
+    .then((resp) => resp.json())
+    .then((data) => data);
+};
+
 export default function withAuth(Component: JSX.ElementType) {
   return async function WithAuth(props: Record<string, unknown>) {
-    const cookieStore = await cookies();
-    const authCookie = cookieStore.get('auth');
-
-    const auth = await fetch('http://localhost:3000/api/authenticate', {
-      method: 'get',
-      headers: {
-        Cookie: `auth=${authCookie?.value || ''}`,
-      },
-    })
-      .then((resp) => resp.json())
-      .then((data) => data);
+    const auth = await getAuth();
 
     return <Component {...props} {...auth} />;
   };

@@ -1,5 +1,6 @@
 import { Providers } from '@/app/providers';
-import withAuth, { AuthPageProps } from '@/components/withAuth';
+import ProfileMenu from '@/components/profileMenu';
+import withAuth, { AuthPageProps, getAuth } from '@/components/withAuth';
 import type { Metadata } from 'next';
 import { Spectral } from 'next/font/google';
 import Link from 'next/link';
@@ -17,17 +18,27 @@ export const metadata: Metadata = {
   description: 'For watchlists with friends!',
 };
 
-async function RootLayout({
-  children,
-}: Readonly<{ children: ReactNode }> & AuthPageProps) {
+async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const authProps = await getAuth();
+
   return (
     <html lang="en">
       <body className={`${spectral.className}`}>
         <Providers>
-          <Box sx={{ m: 2, display: 'flex' }}>
+          <Box
+            sx={{
+              p: 2,
+              pb: 1,
+              display: 'flex',
+              justifyContent: 'space-between',
+              borderBottom: '1px solid #fff',
+              background: '#000',
+            }}
+          >
             <Link href="/">
               <h1>🍿 Movie Night</h1>
             </Link>
+            {authProps.authed && <ProfileMenu {...authProps} />}
           </Box>
           {children}
         </Providers>
@@ -36,4 +47,4 @@ async function RootLayout({
   );
 }
 
-export default withAuth(RootLayout);
+export default RootLayout;
