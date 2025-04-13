@@ -30,14 +30,17 @@ export const simplify = (data: Record<string, any>): Record<string, any> => {
   return data;
 };
 
+export const simplifyItem = (item: Record<string, AttributeValue>) =>
+  Object.entries(item).reduce(
+    (simplifiedItems, [key, val]) => {
+      simplifiedItems[key] = simplify(val);
+      return simplifiedItems;
+    },
+    {} as Record<string, any>,
+  );
+
 export const parseItemsArray = (items: Record<string, AttributeValue>[]) => {
   return items.map((item) => {
-    return Object.entries(item).reduce(
-      (simplifiedItems, [key, val]) => {
-        simplifiedItems[key] = simplify(val);
-        return simplifiedItems;
-      },
-      {} as Record<string, any>,
-    );
+    return simplifyItem(item);
   });
 };

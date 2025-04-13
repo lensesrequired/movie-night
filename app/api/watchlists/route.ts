@@ -1,3 +1,4 @@
+import { itemToWatchlist } from '@/helpers/watchlist';
 import { createParams, dbclient, parseItemsArray } from '@/server/dynamodb';
 import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { AttributeValue } from '@aws-sdk/client-dynamodb/dist-types/models/models_0';
@@ -61,13 +62,7 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({
-    watchlists: parseItemsArray(watchlists).map(
-      ({ PK, SK, ...restWatchlist }) => ({
-        id: SK.replace('SELF#', '').replace('SHARED#', ''),
-        owned: SK.includes('SELF#'),
-        ...restWatchlist,
-      }),
-    ),
+    watchlists: parseItemsArray(watchlists).map(itemToWatchlist),
   });
 }
 
