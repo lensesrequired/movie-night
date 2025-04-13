@@ -1,5 +1,6 @@
 import { AuthProps } from '@/types';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { JSX } from 'react';
 
 export const getAuth = async (): Promise<AuthProps> => {
@@ -16,9 +17,16 @@ export const getAuth = async (): Promise<AuthProps> => {
     .then((data) => data);
 };
 
-export default function withAuth(Component: JSX.ElementType) {
+export default function withAuth(
+  Component: JSX.ElementType,
+  noRedirect?: boolean,
+) {
   return async function WithAuth(props: Record<string, unknown>) {
     const auth = await getAuth();
+
+    if (!noRedirect && !auth.authed) {
+      redirect('/');
+    }
 
     return <Component {...props} {...auth} />;
   };

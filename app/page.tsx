@@ -10,4 +10,4 @@ async function Home({ authed }: AuthProps) {
   return <Auth />;
 }
 
-export default withAuth(Home);
+export default withAuth(Home, true);

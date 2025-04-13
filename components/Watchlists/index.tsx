@@ -9,7 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { Alert, Box, Button } from '@mui/material';
 
 export const Watchlists = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
