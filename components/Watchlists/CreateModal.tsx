@@ -23,7 +23,7 @@ export const CreateWatchlistModal = ({
   const [error, setError] = useState<string>('');
 
   const onCreate = async () => {
-    apiFetch('/api/watchlist', {
+    apiFetch('/api/watchlists', {
       method: 'POST',
       body: JSON.stringify({ title, description }),
     }).then(({ ok, data, error }) => {

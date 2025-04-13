@@ -1,8 +1,9 @@
 import { Auth } from '@/components/Auth';
 import { Watchlists } from '@/components/Watchlists';
-import withAuth, { AuthPageProps } from '@/components/withAuth';
+import withAuth from '@/components/withAuth';
+import { AuthProps } from '@/types';
 
-async function Home({ authed }: AuthPageProps) {
+async function Home({ authed }: AuthProps) {
   if (authed) {
     return <Watchlists />;
   }

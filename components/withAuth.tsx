@@ -1,13 +1,8 @@
+import { AuthProps } from '@/types';
 import { cookies } from 'next/headers';
 import { JSX } from 'react';
 
-export type AuthPageProps = {
-  authed: boolean;
-  email: string;
-  displayName: string;
-};
-
-export const getAuth = async (): Promise<AuthPageProps> => {
+export const getAuth = async (): Promise<AuthProps> => {
   const cookieStore = await cookies();
   const authCookie = cookieStore.get('auth');
 

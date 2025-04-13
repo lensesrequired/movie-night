@@ -1,6 +1,6 @@
 'use client';
 
-import { AuthPageProps } from '@/components/withAuth';
+import { AuthProps } from '@/types';
 import Link from 'next/link';
 import { MouseEvent, useState } from 'react';
 import Logout from '@mui/icons-material/Logout';
@@ -16,7 +16,7 @@ import {
   MenuItem,
 } from '@mui/material';
 
-export const ProfileMenu = ({ displayName }: AuthPageProps) => {
+export const ProfileMenu = ({ displayName }: AuthProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
