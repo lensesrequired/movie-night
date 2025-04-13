@@ -6,10 +6,11 @@ import { apiFetch } from '@/helpers/fetch';
 import { Watchlist } from '@/types';
 import { useEffect, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Button } from '@mui/material';
+import { Alert, Box, Button } from '@mui/material';
 
 export const Watchlists = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string>('');
   const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
 
@@ -22,8 +23,7 @@ export const Watchlists = () => {
       if (ok && data.watchlists) {
         setWatchlists(data.watchlists);
       } else {
-        // TODO: handle error
-        // setError(error || 'Something went wrong. Please try again.');
+        setError(error || 'Something went wrong. Please try again.');
       }
       setIsLoading(false);
     });
@@ -57,6 +57,11 @@ export const Watchlists = () => {
             </Button>
           )}
         </Box>
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
         <WatchlistGrid isLoading={isLoading} watchlists={watchlists} />
       </Box>
       {!watchlists.length && !isLoading && (
