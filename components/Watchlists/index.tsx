@@ -18,7 +18,8 @@ export const Watchlists = () => {
     setShowCreateModal(true);
   };
 
-  useEffect(() => {
+  const retrieveWatchlists = () => {
+    setIsLoading(true);
     apiFetch('/api/watchlists').then(({ ok, data, error }) => {
       if (ok && data.watchlists) {
         setWatchlists(data.watchlists);
@@ -27,6 +28,10 @@ export const Watchlists = () => {
       }
       setIsLoading(false);
     });
+  };
+
+  useEffect(() => {
+    retrieveWatchlists();
   }, []);
 
   return (
@@ -36,6 +41,7 @@ export const Watchlists = () => {
           onClose={() => {
             setShowCreateModal(false);
           }}
+          onSuccess={retrieveWatchlists}
         />
       )}
       <Box sx={{ m: 3 }}>

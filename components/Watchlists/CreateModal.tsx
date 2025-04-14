@@ -13,10 +13,12 @@ import {
 
 export type CreateWatchlistModalProps = {
   onClose: () => void;
+  onSuccess: () => void;
 };
 
 export const CreateWatchlistModal = ({
   onClose,
+  onSuccess,
 }: CreateWatchlistModalProps) => {
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
@@ -28,7 +30,7 @@ export const CreateWatchlistModal = ({
       body: JSON.stringify({ title, description }),
     }).then(({ ok, data, error }) => {
       if (ok && data.success) {
-        // TODO: refresh list
+        onSuccess();
         onClose();
       } else {
         setError(error || 'Something went wrong. Please try again.');
