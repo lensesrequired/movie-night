@@ -1,10 +1,9 @@
 export const itemToWatchlist = (item: Record<string, any>) => {
-  console.log(item);
-  const { PK, SK, ...restWatchlist } = item;
+  const { PK, SK, managedBy, ...restWatchlist } = item;
 
   return {
-    id: SK.replace('SELF#', '').replace('SHARED#', ''),
-    owned: SK.includes('SELF#'),
+    id: SK.replace('LIST#', ''),
+    manager: managedBy.replace('LIST#', ''),
     ...restWatchlist,
   };
 };

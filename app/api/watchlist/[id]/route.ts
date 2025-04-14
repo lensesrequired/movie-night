@@ -1,5 +1,10 @@
 import { itemToWatchlist } from '@/helpers/watchlist';
-import { createParams, dbclient, simplifyItem } from '@/server/dynamodb';
+import {
+  createParams,
+  dbclient,
+  parseItemsArray,
+  simplifyItem,
+} from '@/server/dynamodb';
 import { QueryCommand } from '@aws-sdk/client-dynamodb';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -11,68 +16,38 @@ export async function GET(
     decodeURIComponent(request.cookies.get('info')?.value || '{}'),
   );
   const { id } = await params;
-  let watchlist = null;
 
-  try {
-    const ownedWatchlistResp = await dbclient.send(
+  return await dbclient
+    .send(
       new QueryCommand(
         createParams({
           Limit: 100,
-          KeyConditionExpression: 'PK = :email AND SK = :ownedWatchlist',
+          KeyConditionExpression: 'PK = :email AND SK = :watchlist',
           ExpressionAttributeValues: {
             ':email': { S: `USER#${email}` },
-            ':ownedWatchlist': {
-              S: `SELF#${id}`,
-            },
+            ':watchlist': { S: `LIST#${id}` },
           },
         }),
       ),
-    );
-    if (ownedWatchlistResp.Items) {
-      watchlist = ownedWatchlistResp.Items[0];
-    }
-  } catch (err) {
-    console.log('owned watchlist lookup', err);
-    return NextResponse.json(
-      { _message: 'Watchlist could not be retrieved' },
-      { status: 500 },
-    );
-  }
-
-  if (!watchlist) {
-    try {
-      const sharedWatchlistsResp = await dbclient.send(
-        new QueryCommand(
-          createParams({
-            Limit: 100,
-            KeyConditionExpression: 'PK = :email AND SK = :sharedWatchlist',
-            ExpressionAttributeValues: {
-              ':email': { S: `USER#${email}` },
-              ':sharedWatchlist': { S: `SHARED#${id}` },
-            },
-          }),
-        ),
-      );
-      if (sharedWatchlistsResp.Items) {
-        watchlist = sharedWatchlistsResp.Items[0];
+    )
+    .then((response) => {
+      if (response.Items && response.Items.length) {
+        return NextResponse.json({
+          watchlist: itemToWatchlist(parseItemsArray(response.Items)[0]),
+        });
       }
-    } catch (err) {
-      console.log('shared watchlist lookup', err);
+
+      console.log(`watchlist lookup did not find watchlist ${id}`, response);
+      return NextResponse.json(
+        { _message: 'Watchlist could not be found' },
+        { status: 500 },
+      );
+    })
+    .catch((err) => {
+      console.log('watchlist lookup', err);
       return NextResponse.json(
         { _message: 'Watchlist could not be retrieved' },
         { status: 500 },
       );
-    }
-  }
-
-  if (watchlist) {
-    return NextResponse.json({
-      watchlist: itemToWatchlist(simplifyItem(watchlist)),
     });
-  }
-
-  return NextResponse.json(
-    { _message: 'Watchlist could not be found' },
-    { status: 404 },
-  );
 }

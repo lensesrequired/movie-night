@@ -9,61 +9,41 @@ export async function GET(request: NextRequest) {
   const { email } = JSON.parse(
     decodeURIComponent(request.cookies.get('info')?.value || '{}'),
   );
-  let watchlists: Record<string, AttributeValue>[] = [];
 
-  try {
-    const ownedWatchlistsResp = await dbclient.send(
+  return await dbclient
+    .send(
       new QueryCommand(
         createParams({
           Limit: 100,
           KeyConditionExpression:
-            'PK = :email AND begins_with(SK, :ownedWatchlistPrefix)',
+            'PK = :email AND begins_with(SK, :watchlistPrefix)',
           ExpressionAttributeValues: {
             ':email': { S: `USER#${email}` },
-            ':ownedWatchlistPrefix': { S: 'SELF' },
+            ':watchlistPrefix': { S: 'LIST' },
           },
         }),
       ),
-    );
-    if (ownedWatchlistsResp.Items) {
-      watchlists = watchlists.concat(ownedWatchlistsResp.Items);
-    }
-  } catch (err) {
-    console.log('owned watchlists lookup', err);
-    return NextResponse.json(
-      { _message: 'Watchlists could not be retrieved' },
-      { status: 500 },
-    );
-  }
+    )
+    .then((response) => {
+      if (response.Items) {
+        return NextResponse.json({
+          watchlists: parseItemsArray(response.Items).map(itemToWatchlist),
+        });
+      }
 
-  try {
-    const sharedWatchlistsResp = await dbclient.send(
-      new QueryCommand(
-        createParams({
-          Limit: 100,
-          KeyConditionExpression:
-            'PK = :email AND begins_with(SK, :sharedWatchlistPrefix)',
-          ExpressionAttributeValues: {
-            ':email': { S: `USER#${email}` },
-            ':sharedWatchlistPrefix': { S: 'SHARED' },
-          },
-        }),
-      ),
-    );
-    if (sharedWatchlistsResp.Items) {
-      watchlists = watchlists.concat(sharedWatchlistsResp.Items);
-    }
-  } catch (err) {
-    console.log('shared watchlists lookup', err);
-    return NextResponse.json(
-      { _message: 'Watchlists could not be retrieved' },
-      { status: 500 },
-    );
-  }
-
-  return NextResponse.json({
-    watchlists: parseItemsArray(watchlists).map(itemToWatchlist),
-  });
+      console.log('watchlists lookup did not contain items', response);
+      return NextResponse.json(
+        { _message: 'Watchlists could not be retrieved' },
+        { status: 500 },
+      );
+    })
+    .catch((err) => {
+      console.log('watchlists lookup', err);
+      return NextResponse.json(
+        { _message: 'Watchlists could not be retrieved' },
+        { status: 500 },
+      );
+    });
 }
 
 export async function POST(request: NextRequest) {
@@ -82,8 +62,9 @@ export async function POST(request: NextRequest) {
 
   const item: Record<string, AttributeValue> = {
     PK: { S: `USER#${email}` },
-    SK: { S: `SELF#${uuid()}` },
+    SK: { S: `LIST#${uuid()}` },
     title: { S: title },
+    managedBy: { S: `USER#${email}` },
   };
 
   if (description) {

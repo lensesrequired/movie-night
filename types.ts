@@ -8,5 +8,5 @@ export type Watchlist = {
   id: string;
   title: string;
   description?: string;
-  owned: boolean;
+  manager: string;
 };

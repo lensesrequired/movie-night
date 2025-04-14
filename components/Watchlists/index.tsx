@@ -44,6 +44,7 @@ export const Watchlists = () => {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
           <h1>Your Watchlists</h1>
