@@ -1,4 +1,4 @@
-import { WatchlistDetails } from '@/components/Watchlist/Details';
+import { WatchlistDetails } from '@/components/watchlist/Details';
 import withAuth from '@/components/withAuth';
 import { AuthProps } from '@/types';
 
