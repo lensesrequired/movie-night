@@ -90,7 +90,7 @@ export const Watchlists = () => {
             startIcon={<AddIcon />}
             onClick={openCreateModal}
           >
-            Start Listin'
+            Start Listin&apos;
           </Button>
         </Box>
       )}

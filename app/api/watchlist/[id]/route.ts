@@ -1,7 +1,6 @@
 import { itemToWatchlist } from '@/helpers/watchlist';
 import { createParams, dbclient, parseItemsArray } from '@/server/dynamodb';
 import { QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
-import { AttributeValue } from '@aws-sdk/client-dynamodb/dist-types/models/models_0';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
