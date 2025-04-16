@@ -18,11 +18,11 @@ export const apiFetch = async (
       };
       if (res.ok) {
         response.data = json;
-        return response;
       } else {
         response.error =
           json._message || 'Something went wrong. Please try again later.';
       }
+      return response;
     })
     .catch(async (err) => {
       return {

@@ -24,7 +24,7 @@ export const simplify = (data: Record<string, any>): Record<string, any> => {
       },
       {} as Record<string, any>,
     );
-  } else if (data.S) {
+  } else if (data.S || data.S === '') {
     return data.S;
   }
   return data;

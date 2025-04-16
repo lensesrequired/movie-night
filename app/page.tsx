@@ -1,5 +1,5 @@
 import { Auth } from '@/components/Auth';
-import { Watchlists } from '@/components/Watchlists';
+import { Watchlists } from '@/components/Watchlist';
 import withAuth from '@/components/withAuth';
 import { AuthProps } from '@/types';
 

@@ -1,4 +1,5 @@
 import { apiFetch } from '@/helpers/fetch';
+import { Watchlist } from '@/types';
 import { useState } from 'react';
 import {
   Alert,
@@ -11,22 +12,26 @@ import {
   TextField,
 } from '@mui/material';
 
-export type CreateWatchlistModalProps = {
+export type WatchlistModalProps = {
   onClose: () => void;
   onSuccess: () => void;
+  defaults?: Watchlist;
 };
 
-export const CreateWatchlistModal = ({
+export const WatchlistModal = ({
   onClose,
   onSuccess,
-}: CreateWatchlistModalProps) => {
-  const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
+  defaults,
+}: WatchlistModalProps) => {
+  const [title, setTitle] = useState<string>(defaults?.title || '');
+  const [description, setDescription] = useState<string>(
+    defaults?.description || '',
+  );
   const [error, setError] = useState<string>('');
 
-  const onCreate = async () => {
-    apiFetch('/api/watchlists', {
-      method: 'POST',
+  const onSubmit = async () => {
+    apiFetch(`/api/watchlist${defaults?.id ? `/${defaults.id}` : ''}`, {
+      method: defaults ? 'PATCH' : 'POST',
       body: JSON.stringify({ title, description }),
     }).then(({ ok, data, error }) => {
       if (ok && data.success) {
@@ -73,11 +78,11 @@ export const CreateWatchlistModal = ({
         <Button onClick={onClose}>Cancel</Button>
         <Button
           variant="outlined"
-          onClick={onCreate}
+          onClick={onSubmit}
           disabled={!title}
           autoFocus
         >
-          Create
+          {defaults ? 'Save' : 'Create'}
         </Button>
       </DialogActions>
     </Dialog>

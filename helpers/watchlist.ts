@@ -3,7 +3,7 @@ export const itemToWatchlist = (item: Record<string, any>) => {
 
   return {
     id: SK.replace('LIST#', ''),
-    manager: managedBy.replace('LIST#', ''),
+    manager: managedBy.replace('USER#', ''),
     ...restWatchlist,
   };
 };
