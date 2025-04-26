@@ -1,5 +1,6 @@
 'use client';
 
+import { MovieModal } from '@/components/movie/Modal';
 import { apiFetch } from '@/helpers/fetch';
 import { Watchlist } from '@/types';
 import { useEffect, useState } from 'react';
@@ -8,17 +9,19 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Alert, Box, Button, Skeleton } from '@mui/material';
 import { WatchlistModal } from './Modal';
 
-export function WatchlistDetails({ id, email }: { id: string; email: string }) {
+type WatchlistDetailsProps = { id: string; email: string };
+
+export function WatchlistDetails({ id, email }: WatchlistDetailsProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [watchlist, setWatchlist] = useState<Watchlist>();
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showMovieModal, setShowMovieModal] = useState<boolean>(false);
 
   const retrieveWatchlist = () => {
     setIsLoading(true);
     apiFetch(`/api/watchlist/${id}`).then(({ ok, data, error }) => {
       if (ok && data.watchlist) {
-        console.log(data.watchlist);
         setWatchlist(data.watchlist);
       } else {
         console.log(error);
@@ -41,6 +44,14 @@ export function WatchlistDetails({ id, email }: { id: string; email: string }) {
           }}
           onSuccess={retrieveWatchlist}
           defaults={watchlist}
+        />
+      )}
+      {showMovieModal && (
+        <MovieModal
+          onClose={() => {
+            setShowMovieModal(false);
+          }}
+          onSuccess={retrieveWatchlist}
         />
       )}
       <Box sx={{ m: 3 }}>
@@ -70,7 +81,9 @@ export function WatchlistDetails({ id, email }: { id: string; email: string }) {
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
-                  // onClick={openCreateModal}
+                  onClick={() => {
+                    setShowMovieModal(true);
+                  }}
                 >
                   Add Movie
                 </Button>
