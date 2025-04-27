@@ -1,3 +1,6 @@
+import { simplifyItem } from '@/server/dynamodb';
+import { AttributeValue } from '@aws-sdk/client-dynamodb/dist-types/models/models_0';
+
 export const itemToWatchlist = (item: Record<string, any>) => {
   const { PK, SK, managedBy, ...restWatchlist } = item;
 
@@ -6,4 +9,18 @@ export const itemToWatchlist = (item: Record<string, any>) => {
     manager: managedBy.replace('USER#', ''),
     ...restWatchlist,
   };
+};
+
+export const itemsToWatchlistMovies = (
+  items: Record<string, AttributeValue>[],
+) => {
+  return items.map((item) => {
+    const { PK, SK, GSI_SK, addedBy, ...restMovie } = simplifyItem(item);
+
+    return {
+      id: GSI_SK.replace('MOVIE#', ''),
+      addedBy: addedBy.replace('USER#', ''),
+      ...restMovie,
+    };
+  });
 };

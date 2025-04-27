@@ -1,10 +1,6 @@
 import { createParams, dbclient } from '@/server/dynamodb';
 import { TMDBMovieLookup } from '@/types';
-import {
-  PutItemCommand,
-  QueryCommand,
-  UpdateItemCommand,
-} from '@aws-sdk/client-dynamodb';
+import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { AttributeValue } from '@aws-sdk/client-dynamodb/dist-types/models/models_0';
 import { v4 as uuid } from 'uuid';
 import { NextRequest, NextResponse } from 'next/server';
@@ -18,6 +14,7 @@ export async function PUT(
   );
   const { id } = await params;
 
+  // TODO: chack has access to watchlist
   const {
     id: tmdbId,
     title,
@@ -64,7 +61,7 @@ export async function PUT(
             if (!response.Items || !response.Items.length) {
               const item: Record<string, AttributeValue> = {
                 PK: { S: uuid() },
-                SK: { S: `LIST#${uuid()}` },
+                SK: { S: `LIST#${id}` },
                 GSI_SK: { S: `MOVIE#${tmdbId}` },
                 title: { S: title },
                 posterPath: { S: posterPath },

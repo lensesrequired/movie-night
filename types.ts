@@ -11,6 +11,16 @@ export type Watchlist = {
   manager: string;
 };
 
+export type WatchlistMovieBase = {
+  id: number;
+  title: string;
+  posterPath: string;
+};
+
+export type WatchlistMovie = WatchlistMovieBase & {
+  addedBy: string;
+};
+
 export type TMDBMovieLookup = {
   id: number;
   overview: string;

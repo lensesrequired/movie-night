@@ -1,8 +1,9 @@
 'use client';
 
 import { MovieModal } from '@/components/movie/Modal';
+import { MoviesGrid } from '@/components/watchlist/MoviesGrid';
 import { apiFetch } from '@/helpers/fetch';
-import { Watchlist } from '@/types';
+import { Watchlist, WatchlistMovie } from '@/types';
 import { useEffect, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -13,8 +14,10 @@ type WatchlistDetailsProps = { id: string; email: string };
 
 export function WatchlistDetails({ id, email }: WatchlistDetailsProps) {
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMovies, setIsLoadingMovies] = useState(true);
   const [error, setError] = useState<string>('');
   const [watchlist, setWatchlist] = useState<Watchlist>();
+  const [movies, setMovies] = useState<WatchlistMovie[]>([]);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showMovieModal, setShowMovieModal] = useState<boolean>(false);
 
@@ -24,15 +27,27 @@ export function WatchlistDetails({ id, email }: WatchlistDetailsProps) {
       if (ok && data.watchlist) {
         setWatchlist(data.watchlist);
       } else {
-        console.log(error);
         setError(error || 'Something went wrong. Please try again.');
       }
       setIsLoading(false);
     });
   };
 
+  const retrieveMovies = () => {
+    setIsLoadingMovies(true);
+    apiFetch(`/api/watchlist/${id}/movies`).then(({ ok, data, error }) => {
+      if (ok && data.movies) {
+        setMovies(data.movies);
+      } else {
+        setError(error || 'Something went wrong. Please try again.');
+      }
+      setIsLoadingMovies(false);
+    });
+  };
+
   useEffect(() => {
     retrieveWatchlist();
+    retrieveMovies();
   }, []);
 
   return (
@@ -52,7 +67,7 @@ export function WatchlistDetails({ id, email }: WatchlistDetailsProps) {
           onClose={() => {
             setShowMovieModal(false);
           }}
-          onSuccess={retrieveWatchlist}
+          onSuccess={retrieveMovies}
         />
       )}
       <Box sx={{ m: 3 }}>
@@ -107,6 +122,7 @@ export function WatchlistDetails({ id, email }: WatchlistDetailsProps) {
             {error}
           </Alert>
         )}
+        <MoviesGrid isLoading={isLoadingMovies} movies={movies} />
       </Box>
     </>
   );

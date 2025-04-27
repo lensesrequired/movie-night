@@ -19,7 +19,6 @@ export function middleware(request: NextRequest) {
     }
 
     request.cookies.set('info', encodeURIComponent(JSON.stringify(token)));
-    console.log('cookie set');
     return NextResponse.next({ request });
   } else {
     return NextResponse.json(
@@ -36,6 +35,7 @@ export const config = {
     '/api/watchlist',
     '/api/watchlist/:id',
     '/api/watchlist/:id/movie',
+    '/api/watchlist/:id/movies',
   ],
   runtime: 'nodejs',
 };
