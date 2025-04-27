@@ -48,6 +48,7 @@ export function WatchlistDetails({ id, email }: WatchlistDetailsProps) {
       )}
       {showMovieModal && (
         <MovieModal
+          watchlistId={id}
           onClose={() => {
             setShowMovieModal(false);
           }}

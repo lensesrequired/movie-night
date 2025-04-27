@@ -1,11 +1,11 @@
-import { TMDBMovie, TMDBMovieBase } from '@/types';
+import { TMDBMovie, TMDBMovieLookup } from '@/types';
 
-export const convertTMDBResults = (results: TMDBMovie[]): TMDBMovieBase[] => {
+export const convertTMDBResults = (results: TMDBMovie[]): TMDBMovieLookup[] => {
   return results.map(({ id, title, overview, release_date, poster_path }) => ({
     id,
     title,
     overview,
-    release_date,
-    poster_path,
+    releaseDate: release_date,
+    posterPath: poster_path || '',
   }));
 };

@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
   const { email } = JSON.parse(
     decodeURIComponent(request.cookies.get('info')?.value || '{}'),
   );
+  console.log('post', email);
 
   const { title, description } = await request.json();
 
@@ -21,6 +22,7 @@ export async function POST(request: NextRequest) {
   const item: Record<string, AttributeValue> = {
     PK: { S: `USER#${email}` },
     SK: { S: `LIST#${uuid()}` },
+    GSI_SK: { S: `LIST#${uuid()}` },
     title: { S: title },
     managedBy: { S: `USER#${email}` },
   };

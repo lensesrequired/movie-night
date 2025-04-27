@@ -19,6 +19,7 @@ export function middleware(request: NextRequest) {
     }
 
     request.cookies.set('info', encodeURIComponent(JSON.stringify(token)));
+    console.log('cookie set');
     return NextResponse.next({ request });
   } else {
     return NextResponse.json(
@@ -30,6 +31,11 @@ export function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/api/watchlists', '/api/watchlist/:id'],
+  matcher: [
+    '/api/watchlists',
+    '/api/watchlist',
+    '/api/watchlist/:id',
+    '/api/watchlist/:id/movie',
+  ],
   runtime: 'nodejs',
 };

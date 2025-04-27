@@ -1,5 +1,5 @@
 import { apiFetch } from '@/helpers/fetch';
-import { TMDBMovieBase } from '@/types';
+import { TMDBMovieLookup } from '@/types';
 import Image from 'next/image';
 import { useState } from 'react';
 import {
@@ -15,18 +15,23 @@ import {
 } from '@mui/material';
 
 export type MovieModalProps = {
+  watchlistId: string;
   onClose: () => void;
   onSuccess: () => void;
 };
 
-export const MovieModal = ({ onClose, onSuccess }: MovieModalProps) => {
+export const MovieModal = ({
+  watchlistId,
+  onClose,
+  onSuccess,
+}: MovieModalProps) => {
   const [search, setSearch] = useState<string>('');
   const [year, setYear] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [results, setResults] = useState<TMDBMovieBase[]>([]);
+  const [results, setResults] = useState<TMDBMovieLookup[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
 
-  const onSearch = async () => {
+  const onSearch = () => {
     // TODO: add year to query
     apiFetch(`/api/movie?search=${search}`).then(({ ok, data, error }) => {
       if (ok && data) {
@@ -43,6 +48,24 @@ export const MovieModal = ({ onClose, onSuccess }: MovieModalProps) => {
         setResults([]);
       }
     });
+  };
+
+  const onAddMovie = async () => {
+    if (selected || selected === 0) {
+      apiFetch(`/api/watchlist/${watchlistId}/movie`, {
+        method: 'put',
+        body: JSON.stringify(results[selected]),
+      }).then(({ ok, data, error }) => {
+        if (ok && data.success) {
+          onSuccess();
+          onClose();
+        } else {
+          setError(error || 'Something went wrong. Please try again.');
+        }
+      });
+    } else {
+      setError('No movie selected.');
+    }
   };
 
   return (
@@ -88,7 +111,7 @@ export const MovieModal = ({ onClose, onSuccess }: MovieModalProps) => {
         {Boolean(results.length) && (
           <Box sx={{ my: 2 }}>
             {results.map(
-              ({ id, title, release_date, overview, poster_path }, i) => (
+              ({ id, title, releaseDate, overview, posterPath }, i) => (
                 <Box
                   key={id}
                   sx={{
@@ -115,11 +138,11 @@ export const MovieModal = ({ onClose, onSuccess }: MovieModalProps) => {
                     elevation={6}
                     sx={{ width: '130px', height: '180px', mb: 1, mr: 2 }}
                   >
-                    {poster_path && (
+                    {posterPath && (
                       <Image
                         width={130}
                         height={180}
-                        src={`https://image.tmdb.org/t/p/w500/${poster_path}`}
+                        src={`https://image.tmdb.org/t/p/w500/${posterPath}`}
                         alt={`${title} poster image`}
                       />
                     )}
@@ -127,8 +150,8 @@ export const MovieModal = ({ onClose, onSuccess }: MovieModalProps) => {
                   <div>
                     <h3>{title}</h3>
                     <Box>
-                      {release_date &&
-                        new Date(release_date).toLocaleDateString()}
+                      {releaseDate &&
+                        new Date(releaseDate).toLocaleDateString()}
                     </Box>
                     <Box color="text.secondary">{overview}</Box>
                   </div>
@@ -142,7 +165,7 @@ export const MovieModal = ({ onClose, onSuccess }: MovieModalProps) => {
         <Button onClick={onClose}>Cancel</Button>
         <Button
           variant="outlined"
-          // onClick={onSearch}
+          onClick={onAddMovie}
           disabled={selected === null}
         >
           Add Movie
