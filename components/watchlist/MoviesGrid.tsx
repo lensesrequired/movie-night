@@ -1,4 +1,4 @@
-import { Watchlist, WatchlistMovie } from '@/types';
+import { WatchlistMovie } from '@/types';
 import Image from 'next/image';
 import { Box, Button, Grid, Paper, Skeleton } from '@mui/material';
 
@@ -10,12 +10,12 @@ type MoviesGridProps = {
 export const MoviesGrid = ({ isLoading, movies }: MoviesGridProps) => {
   return (
     <Box sx={{ p: 3, width: '100%' }}>
-      <Grid id="movie-grid" container spacing={2}>
+      <Grid id="movie-grid" container spacing={2} mt={1}>
         {(isLoading ? Array(6).fill(null) : movies).map((movie, index) => (
-          <Grid key={`watchlist-${movie?.id || index}`}>
+          <Grid key={`watchlist-${movie?.tmdbId || index}`}>
             {movie ? (
               <Button
-                href={`https://www.themoviedb.org/movie/${movie.id}`}
+                href={`https://www.themoviedb.org/movie/${movie.tmdbId}`}
                 target="_blank"
               >
                 <Box

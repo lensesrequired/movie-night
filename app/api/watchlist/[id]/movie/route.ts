@@ -19,6 +19,7 @@ export async function PUT(
     id: tmdbId,
     title,
     posterPath,
+    releaseDate,
   }: TMDBMovieLookup = await request.json();
 
   if (!tmdbId) {
@@ -62,11 +63,17 @@ export async function PUT(
               const item: Record<string, AttributeValue> = {
                 PK: { S: uuid() },
                 SK: { S: `LIST#${id}` },
-                GSI_SK: { S: `MOVIE#${tmdbId}` },
-                title: { S: title },
+                GSI_SK: { S: `MOVIE#${title}` },
+                tmdbId: { S: tmdbId.toString() },
                 posterPath: { S: posterPath },
                 addedBy: { S: `USER#${email}` },
+                dateAdded: { N: new Date().getTime().toString() },
               };
+              if (releaseDate) {
+                item.releaseDate = {
+                  N: new Date(releaseDate).getTime().toString(),
+                };
+              }
 
               return dbclient
                 .send(

@@ -18,7 +18,7 @@ export const itemsToWatchlistMovies = (
     const { PK, SK, GSI_SK, addedBy, ...restMovie } = simplifyItem(item);
 
     return {
-      id: GSI_SK.replace('MOVIE#', ''),
+      title: GSI_SK.replace('MOVIE#', ''),
       addedBy: addedBy.replace('USER#', ''),
       ...restMovie,
     };
