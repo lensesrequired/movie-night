@@ -33,7 +33,12 @@ export const MovieModal = ({
 
   const onSearch = () => {
     // TODO: add year to query
-    apiFetch(`/api/movie?search=${search}`).then(({ ok, data, error }) => {
+    const params = new URLSearchParams();
+    params.set('search', search);
+    if (year) {
+      params.set('year', year);
+    }
+    apiFetch(`/api/movie?${params.toString()}`).then(({ ok, data, error }) => {
       if (ok && data) {
         setError('');
         const { results } = data;

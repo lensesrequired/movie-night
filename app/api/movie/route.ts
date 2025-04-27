@@ -82,6 +82,7 @@ const getMockData = async () => ({ json: async () => mockReturn });
 
 export async function GET(request: NextRequest) {
   const searchText = request.nextUrl.searchParams.get('search');
+  const year = request.nextUrl.searchParams.get('year');
 
   if (!searchText) {
     return NextResponse.json(
@@ -90,18 +91,24 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const query = new URLSearchParams({
+    query: searchText,
+    include_adult: 'false',
+    language: 'en-US',
+    page: '1',
+  });
+  if (year) {
+    query.set('year', year);
+  }
   return (
     ['zootopia', 'test'].includes(searchText.toLowerCase())
       ? getMockData()
-      : fetch(
-          `https://api.themoviedb.org/3/search/movie?query=${searchText}&include_adult=false&language=en-US&page=1`,
-          {
-            headers: {
-              accept: 'application/json',
-              Authorization: `Bearer ${process.env.TMDB_READ_ACCESS_TOKEN}`,
-            },
+      : fetch(`https://api.themoviedb.org/3/search/movie?${query.toString()}`, {
+          headers: {
+            accept: 'application/json',
+            Authorization: `Bearer ${process.env.TMDB_READ_ACCESS_TOKEN}`,
           },
-        )
+        })
   )
     .then((res) => res.json())
     .then((res) => {
