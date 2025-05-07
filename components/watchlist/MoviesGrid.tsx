@@ -1,6 +1,9 @@
 import { WatchlistMovie } from '@/types';
 import Image from 'next/image';
-import { Box, Button, Grid, Paper, Skeleton } from '@mui/material';
+import { MouseEvent, useState } from 'react';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import { Box, Button, Grid, Link, Paper, Skeleton } from '@mui/material';
 
 type MoviesGridProps = {
   isLoading?: boolean;
@@ -8,6 +11,18 @@ type MoviesGridProps = {
 };
 
 export const MoviesGrid = ({ isLoading, movies }: MoviesGridProps) => {
+  const [selected, setSelected] = useState<number[]>([]);
+
+  const onMovieClick = (e: MouseEvent, index: number) => {
+    if ((e.target as Element).tagName.toLowerCase() !== 'a') {
+      if (selected.includes(index)) {
+        setSelected(selected.filter((i) => i !== index));
+      } else {
+        setSelected([...selected, index]);
+      }
+    }
+  };
+
   return (
     <Box sx={{ p: 3, width: '100%' }}>
       <Grid id="movie-grid" container spacing={2} mt={1}>
@@ -15,28 +30,87 @@ export const MoviesGrid = ({ isLoading, movies }: MoviesGridProps) => {
           <Grid key={`watchlist-${movie?.tmdbId || index}`}>
             {movie ? (
               <Button
-                href={`https://www.themoviedb.org/movie/${movie.tmdbId}`}
-                target="_blank"
+                onClick={(e) => {
+                  onMovieClick(e, index);
+                }}
+                sx={{
+                  '& .movie-title': {
+                    zIndex: '1000',
+                  },
+                  '& .select-box': {
+                    width: '100%',
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
+                  },
+                  '.unselected': {
+                    display: 'none',
+                  },
+                  '&:hover': {
+                    '.overlay': {
+                      backgroundColor: 'grey.700',
+                      opacity: 0.66,
+                      borderRadius: '3px',
+                    },
+                    '.unselected': {
+                      display: 'inline',
+                      mt: 0.25,
+                      ml: 0.25,
+                    },
+                  },
+                }}
+                className={selected.includes(index) ? 'selected' : ''}
               >
                 <Box
                   sx={{
-                    width: '130px',
+                    width: '150px',
                     textAlign: 'center',
                     textTransform: 'initial',
                   }}
                 >
                   <Paper
+                    className="overlay"
                     elevation={24}
-                    sx={{ width: '130px', height: '180px', mb: 1 }}
+                    sx={{ width: '150px', height: '225px', mb: 1 }}
                   >
                     <Image
-                      width={130}
-                      height={180}
+                      width={150}
+                      height={225}
                       src={`https://image.tmdb.org/t/p/w500/${movie.posterPath}`}
                       alt={`${movie.title} poster image`}
                     />
                   </Paper>
-                  {movie.title}
+                  <Box
+                    sx={{
+                      display: 'absolute',
+                      textAlign: 'left',
+                      pt: 1.5,
+                      pl: 1.75,
+                    }}
+                    className="select-box"
+                  >
+                    {selected.includes(index) ? (
+                      <CheckBoxIcon
+                        htmlColor="#fff"
+                        sx={{
+                          background: 'radial-gradient(#000, transparent)',
+                        }}
+                      />
+                    ) : (
+                      <CheckBoxOutlineBlankIcon
+                        className="unselected"
+                        htmlColor="#fff"
+                        fontSize="small"
+                      />
+                    )}
+                  </Box>
+                  <Link
+                    className="movie-title"
+                    href={`https://www.themoviedb.org/movie/${movie.tmdbId}`}
+                    target="_blank"
+                  >
+                    {movie.title}
+                  </Link>
                 </Box>
               </Button>
             ) : (
