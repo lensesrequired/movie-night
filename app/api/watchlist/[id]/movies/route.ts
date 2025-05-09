@@ -1,9 +1,6 @@
 import { itemsToWatchlistMovies } from '@/helpers/watchlist';
 import { createParams, dbclient } from '@/server/dynamodb';
-import { TMDBMovieLookup } from '@/types';
-import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
-import { AttributeValue } from '@aws-sdk/client-dynamodb/dist-types/models/models_0';
-import { v4 as uuid } from 'uuid';
+import { QueryCommand } from '@aws-sdk/client-dynamodb';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -20,7 +17,7 @@ export async function GET(
           Limit: 100,
           IndexName: 'GSI1',
           KeyConditionExpression:
-            'SK = :watchlist AND begins_with(GSI_SK, :moviePrefix)',
+            'SK = :watchlist AND begins_with(PK, :moviePrefix)',
           ExpressionAttributeValues: {
             ':watchlist': { S: `LIST#${id}` },
             ':moviePrefix': { S: 'MOVIE' },

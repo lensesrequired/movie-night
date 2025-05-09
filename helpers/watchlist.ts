@@ -15,10 +15,10 @@ export const itemsToWatchlistMovies = (
   items: Record<string, AttributeValue>[],
 ) => {
   return items.map((item) => {
-    const { PK, SK, GSI_SK, addedBy, ...restMovie } = simplifyItem(item);
+    const { PK, SK, addedBy, ...restMovie } = simplifyItem(item);
 
     return {
-      title: GSI_SK.replace('MOVIE#', ''),
+      tmdbId: PK.replace('MOVIE#', ''),
       addedBy: addedBy.replace('USER#', ''),
       ...restMovie,
     };

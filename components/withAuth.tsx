@@ -22,6 +22,7 @@ export default function withAuth(
   noRedirect?: boolean,
 ) {
   return async function WithAuth(props: Record<string, unknown>) {
+    // TODO: fix bug where account has been removed from DB but still shows logged in if cookie exists
     const auth = await getAuth();
 
     if (!noRedirect && !auth.authed) {

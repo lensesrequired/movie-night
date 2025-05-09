@@ -8,7 +8,7 @@ export type GenericResponse = {
 export const apiFetch = async (
   url: string,
   options?: RequestInit,
-): Promise<any> => {
+): Promise<GenericResponse> => {
   return fetch(url, options)
     .then(async (res) => {
       const json = await res.json();

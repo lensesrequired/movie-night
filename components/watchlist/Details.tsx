@@ -122,7 +122,13 @@ export function WatchlistDetails({ id, email }: WatchlistDetailsProps) {
             {error}
           </Alert>
         )}
-        <MoviesGrid isLoading={isLoadingMovies} movies={movies} />
+        <MoviesGrid
+          isLoading={isLoadingMovies}
+          watchlistId={id}
+          movies={movies}
+          reloadMovies={retrieveMovies}
+          setError={setError}
+        />
       </Box>
     </>
   );

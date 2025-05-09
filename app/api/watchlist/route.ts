@@ -22,7 +22,6 @@ export async function POST(request: NextRequest) {
   const item: Record<string, AttributeValue> = {
     PK: { S: `USER#${email}` },
     SK: { S: `LIST#${uuid()}` },
-    GSI_SK: { S: `LIST#${uuid()}` },
     title: { S: title },
     managedBy: { S: `USER#${email}` },
   };

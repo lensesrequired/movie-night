@@ -1,3 +1,4 @@
+import { apiFetch } from '@/helpers/fetch';
 import { WatchlistMovie } from '@/types';
 import Image from 'next/image';
 import { MouseEvent, useState } from 'react';
@@ -7,11 +8,21 @@ import { Box, Button, Grid, Link, Paper, Skeleton } from '@mui/material';
 
 type MoviesGridProps = {
   isLoading?: boolean;
+  watchlistId: string;
   movies: WatchlistMovie[];
+  reloadMovies: () => void;
+  setError: (error: string) => void;
 };
 
-export const MoviesGrid = ({ isLoading, movies }: MoviesGridProps) => {
+export const MoviesGrid = ({
+  isLoading,
+  watchlistId,
+  movies,
+  reloadMovies,
+  setError,
+}: MoviesGridProps) => {
   const [selected, setSelected] = useState<number[]>([]);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const onMovieClick = (e: MouseEvent, index: number) => {
     if ((e.target as Element).tagName.toLowerCase() !== 'a') {
@@ -23,8 +34,42 @@ export const MoviesGrid = ({ isLoading, movies }: MoviesGridProps) => {
     }
   };
 
+  const onSelect = () => {
+    setSelected(selected.length ? [] : movies.map((_, i) => i));
+  };
+
+  const onRemove = () => {
+    setIsDeleting(true);
+    apiFetch(`/api/watchlist/${watchlistId}/movies/delete`, {
+      method: 'POST',
+      body: JSON.stringify({ movies: selected.map((i) => movies[i].tmdbId) }),
+    }).then(({ ok, data, error }) => {
+      if (ok && data.success) {
+        reloadMovies();
+        setSelected([]);
+      } else if (error) {
+        setError(error);
+      }
+      setIsDeleting(false);
+    });
+  };
+
   return (
     <Box sx={{ p: 3, width: '100%' }}>
+      <Box sx={{ display: 'flex', gap: 1, p: 1 }}>
+        <Button variant="contained">Start a Poll</Button>
+        <Button variant="outlined" onClick={onSelect}>
+          {selected.length ? 'Unselect All' : 'Select All'}
+        </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          disabled={selected.length === 0 || isDeleting}
+          onClick={onRemove}
+        >
+          Remove Movies
+        </Button>
+      </Box>
       <Grid id="movie-grid" container spacing={2} mt={1}>
         {(isLoading ? Array(6).fill(null) : movies).map((movie, index) => (
           <Grid key={`watchlist-${movie?.tmdbId || index}`}>

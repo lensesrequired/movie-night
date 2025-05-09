@@ -9,8 +9,10 @@ export const dbclient = new DynamoDBClient({
   region: 'us-east-1',
 });
 
+export const TABLE_NAME = 'movie-night-table';
+
 export const createParams = <T>(attrs: Omit<T, 'TableName'>): T => {
-  return { TableName: 'movie-night-table', ...attrs } as T;
+  return { TableName: TABLE_NAME, ...attrs } as T;
 };
 
 export const simplify = (data: Record<string, any>): Record<string, any> => {

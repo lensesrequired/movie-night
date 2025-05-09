@@ -2,7 +2,6 @@ import { createParams, dbclient } from '@/server/dynamodb';
 import { TMDBMovieLookup } from '@/types';
 import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { AttributeValue } from '@aws-sdk/client-dynamodb/dist-types/models/models_0';
-import { v4 as uuid } from 'uuid';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function PUT(
@@ -50,7 +49,7 @@ export async function PUT(
               createParams({
                 Limit: 100,
                 IndexName: 'GSI1',
-                KeyConditionExpression: 'SK = :watchlist AND GSI_SK = :movie',
+                KeyConditionExpression: 'SK = :watchlist AND PK = :movie',
                 ExpressionAttributeValues: {
                   ':watchlist': { S: `LIST#${id}` },
                   ':movie': { S: `MOVIE#${tmdbId}` },
@@ -61,10 +60,9 @@ export async function PUT(
           .then((response) => {
             if (!response.Items || !response.Items.length) {
               const item: Record<string, AttributeValue> = {
-                PK: { S: uuid() },
+                PK: { S: `MOVIE#${tmdbId}` },
                 SK: { S: `LIST#${id}` },
-                GSI_SK: { S: `MOVIE#${title}` },
-                tmdbId: { S: tmdbId.toString() },
+                title: { S: title },
                 posterPath: { S: posterPath },
                 addedBy: { S: `USER#${email}` },
                 dateAdded: { N: new Date().getTime().toString() },
