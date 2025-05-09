@@ -2,10 +2,13 @@
 
 import { ReactNode } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material';
+import themeVals from '../material-theme.json';
 
 const theme = createTheme({
-  colorSchemes: {
-    dark: true,
+  ...themeVals,
+  palette: {
+    mode: 'dark',
+    ...themeVals.palettes,
   },
 });
 

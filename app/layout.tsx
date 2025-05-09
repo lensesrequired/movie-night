@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 import { Spectral } from 'next/font/google';
 import Link from 'next/link';
 import { ReactNode } from 'react';
-import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 import './globals.scss';
 
 const spectral = Spectral({
@@ -25,21 +25,23 @@ async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
     <html lang="en">
       <body className={`${spectral.className}`}>
         <Providers>
-          <Box
+          <Paper
+            elevation={16}
             sx={{
-              p: 2,
-              pb: 1,
+              py: 1,
+              px: 2,
+              m: 1,
               display: 'flex',
               justifyContent: 'space-between',
-              borderBottom: '1px solid #fff',
-              background: '#000',
+              backgroundColor: 'primary.900',
+              borderRadius: '.5rem',
             }}
           >
             <Link href="/">
               <h1>🍿 Movie Night</h1>
             </Link>
             {authProps.authed && <ProfileMenu {...authProps} />}
-          </Box>
+          </Paper>
           {children}
         </Providers>
       </body>
