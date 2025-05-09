@@ -1,6 +1,7 @@
 import { itemToWatchlist } from '@/helpers/watchlist';
 import { createParams, dbclient, parseItemsArray } from '@/server/dynamodb';
-import { QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { checkHasAccess } from '@/server/watchlist';
+import { UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -12,39 +13,25 @@ export async function GET(
   );
   const { id } = await params;
 
-  return await dbclient
-    .send(
-      new QueryCommand(
-        createParams({
-          Limit: 100,
-          KeyConditionExpression: 'PK = :email AND SK = :watchlist',
-          ExpressionAttributeValues: {
-            ':email': { S: `USER#${email}` },
-            ':watchlist': { S: `LIST#${id}` },
-          },
-        }),
-      ),
-    )
-    .then((response) => {
-      if (response.Items && response.Items.length) {
-        return NextResponse.json({
-          watchlist: itemToWatchlist(parseItemsArray(response.Items)[0]),
-        });
-      }
+  if (!(await checkHasAccess(id, email))) {
+    return NextResponse.json(
+      { _message: 'Watchlist does not exist or you do not have access' },
+      { status: 403 },
+    );
+  }
 
-      console.log(`watchlist lookup did not find watchlist ${id}`, response);
-      return NextResponse.json(
-        { _message: 'Watchlist could not be found' },
-        { status: 404 },
-      );
-    })
-    .catch((err) => {
-      console.log('watchlist lookup', err);
-      return NextResponse.json(
-        { _message: 'Watchlist could not be retrieved' },
-        { status: 500 },
-      );
-    });
+  return checkHasAccess(id, email).then((response) => {
+    if (response && response.Items) {
+      return NextResponse.json({
+        watchlist: itemToWatchlist(parseItemsArray(response.Items)[0]),
+      });
+    }
+
+    return NextResponse.json(
+      { _message: 'Watchlist does not exist or you do not have access' },
+      { status: 403 },
+    );
+  });
 }
 
 export async function PATCH(
@@ -55,6 +42,13 @@ export async function PATCH(
     decodeURIComponent(request.cookies.get('info')?.value || '{}'),
   );
   const { id } = await params;
+
+  if (!(await checkHasAccess(id, email))) {
+    return NextResponse.json(
+      { _message: 'Watchlist does not exist or you do not have access' },
+      { status: 403 },
+    );
+  }
 
   const { title, description } = await request.json();
 
@@ -67,61 +61,29 @@ export async function PATCH(
 
   return dbclient
     .send(
-      new QueryCommand(
+      new UpdateItemCommand(
         createParams({
-          Limit: 100,
-          KeyConditionExpression: 'PK = :email AND SK = :watchlist',
+          Key: {
+            PK: { S: `USER#${email}` },
+            SK: { S: `LIST#${id}` },
+          },
+          UpdateExpression: 'SET #TITLE = :title, #DESCRIPTION = :description',
+          ExpressionAttributeNames: {
+            '#TITLE': 'title',
+            '#DESCRIPTION': 'description',
+          },
           ExpressionAttributeValues: {
-            ':email': { S: `USER#${email}` },
-            ':watchlist': { S: `LIST#${id}` },
+            ':title': { S: title },
+            ':description': { S: description },
           },
         }),
       ),
     )
-    .then((response) => {
-      if (response.Items && response.Items.length) {
-        return dbclient
-          .send(
-            new UpdateItemCommand(
-              createParams({
-                Key: {
-                  PK: { S: `USER#${email}` },
-                  SK: { S: `LIST#${id}` },
-                },
-                UpdateExpression:
-                  'SET #TITLE = :title, #DESCRIPTION = :description',
-                ExpressionAttributeNames: {
-                  '#TITLE': 'title',
-                  '#DESCRIPTION': 'description',
-                },
-                ExpressionAttributeValues: {
-                  ':title': { S: title },
-                  ':description': { S: description },
-                },
-              }),
-            ),
-          )
-          .then(() => {
-            return NextResponse.json({ success: true });
-          })
-          .catch(async (err) => {
-            // log error
-            console.log('watchlist update', err);
-            return NextResponse.json(
-              { _message: 'Watchlist could not be updated' },
-              { status: 500 },
-            );
-          });
-      }
-
-      console.log(`watchlist update could not find watchlist ${id}`, response);
-      return NextResponse.json(
-        { _message: 'Watchlist could not be found' },
-        { status: 404 },
-      );
+    .then(() => {
+      return NextResponse.json({ success: true });
     })
-    .catch((err) => {
-      console.log('watchlist update lookup', err);
+    .catch(async (err) => {
+      console.log('watchlist update', err);
       return NextResponse.json(
         { _message: 'Watchlist could not be updated' },
         { status: 500 },

@@ -1,4 +1,5 @@
 import { createParams, dbclient } from '@/server/dynamodb';
+import { checkHasAccess } from '@/server/watchlist';
 import { TMDBMovieLookup } from '@/types';
 import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { AttributeValue } from '@aws-sdk/client-dynamodb/dist-types/models/models_0';
@@ -13,7 +14,13 @@ export async function PUT(
   );
   const { id } = await params;
 
-  // TODO: chack has access to watchlist
+  if (!(await checkHasAccess(id, email))) {
+    return NextResponse.json(
+      { _message: 'Watchlist does not exist or you do not have access' },
+      { status: 403 },
+    );
+  }
+
   const {
     id: tmdbId,
     title,
@@ -34,84 +41,58 @@ export async function PUT(
         createParams({
           Limit: 100,
           IndexName: 'GSI1',
-          KeyConditionExpression: 'SK = :watchlist',
+          KeyConditionExpression: 'SK = :watchlist AND PK = :movie',
           ExpressionAttributeValues: {
             ':watchlist': { S: `LIST#${id}` },
+            ':movie': { S: `MOVIE#${tmdbId}` },
           },
         }),
       ),
     )
-    .then((watchlistResponse) => {
-      if (watchlistResponse.Items && watchlistResponse.Items.length) {
+    .then((response) => {
+      if (!response.Items || !response.Items.length) {
+        const item: Record<string, AttributeValue> = {
+          PK: { S: `MOVIE#${tmdbId}` },
+          SK: { S: `LIST#${id}` },
+          title: { S: title },
+          posterPath: { S: posterPath },
+          addedBy: { S: `USER#${email}` },
+          dateAdded: { N: new Date().getTime().toString() },
+        };
+        if (releaseDate) {
+          item.releaseDate = {
+            N: new Date(releaseDate).getTime().toString(),
+          };
+        }
+
         return dbclient
           .send(
-            new QueryCommand(
+            new PutItemCommand(
               createParams({
-                Limit: 100,
-                IndexName: 'GSI1',
-                KeyConditionExpression: 'SK = :watchlist AND PK = :movie',
-                ExpressionAttributeValues: {
-                  ':watchlist': { S: `LIST#${id}` },
-                  ':movie': { S: `MOVIE#${tmdbId}` },
-                },
+                Item: item,
               }),
             ),
           )
-          .then((response) => {
-            if (!response.Items || !response.Items.length) {
-              const item: Record<string, AttributeValue> = {
-                PK: { S: `MOVIE#${tmdbId}` },
-                SK: { S: `LIST#${id}` },
-                title: { S: title },
-                posterPath: { S: posterPath },
-                addedBy: { S: `USER#${email}` },
-                dateAdded: { N: new Date().getTime().toString() },
-              };
-              if (releaseDate) {
-                item.releaseDate = {
-                  N: new Date(releaseDate).getTime().toString(),
-                };
-              }
-
-              return dbclient
-                .send(
-                  new PutItemCommand(
-                    createParams({
-                      Item: item,
-                    }),
-                  ),
-                )
-                .then(() => {
-                  return NextResponse.json({ success: true });
-                })
-                .catch(async (err) => {
-                  // log error
-                  console.log('watchlist add movie', err);
-                  return NextResponse.json(
-                    { _message: 'Movie could not be added' },
-                    { status: 500 },
-                  );
-                });
-            }
-
-            console.log(
-              `watchlist add movie already exists ${id}:${tmdbId}`,
-              watchlistResponse,
-            );
+          .then(() => {
+            return NextResponse.json({ success: true });
+          })
+          .catch(async (err) => {
+            // log error
+            console.log('watchlist add movie', err);
             return NextResponse.json(
-              { _message: 'Movie already in Watchlist' },
-              { status: 400 },
+              { _message: 'Movie could not be added' },
+              { status: 500 },
             );
           });
       }
 
       console.log(
-        `watchlist add movie could not find watchlist ${id}`,
-        watchlistResponse,
+        `watchlist add movie already exists ${id}:${tmdbId}`,
+        response,
       );
       return NextResponse.json(
-        { _message: 'Watchlist could not be found' },
-        { status: 404 },
+        { _message: 'Movie already in Watchlist' },
+        { status: 400 },
       );
     })
     .catch((err) => {

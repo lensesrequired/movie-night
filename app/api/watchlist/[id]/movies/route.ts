@@ -1,5 +1,6 @@
 import { itemsToWatchlistMovies } from '@/helpers/watchlist';
 import { createParams, dbclient } from '@/server/dynamodb';
+import { checkHasAccess } from '@/server/watchlist';
 import { QueryCommand } from '@aws-sdk/client-dynamodb';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -7,9 +8,18 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { email } = JSON.parse(
+    decodeURIComponent(request.cookies.get('info')?.value || '{}'),
+  );
   const { id } = await params;
 
-  // TODO: check has access to watchlist
+  if (!(await checkHasAccess(id, email))) {
+    return NextResponse.json(
+      { _message: 'Watchlist does not exist or you do not have access' },
+      { status: 403 },
+    );
+  }
+
   return dbclient
     .send(
       new QueryCommand(

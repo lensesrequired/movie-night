@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
   const authCookie = request.cookies.get('auth');
 
@@ -36,6 +35,7 @@ export const config = {
     '/api/watchlist/:id',
     '/api/watchlist/:id/movie',
     '/api/watchlist/:id/movies',
+    '/api/watchlist/:id/movies/delete',
   ],
   runtime: 'nodejs',
 };
