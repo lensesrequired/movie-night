@@ -5,10 +5,10 @@ import { v4 as uuid } from 'uuid';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  const { email } = JSON.parse(
+  const { username } = JSON.parse(
     decodeURIComponent(request.cookies.get('info')?.value || '{}'),
   );
-  console.log('post', email);
+  console.log('post', username);
 
   const { title, description } = await request.json();
 
@@ -20,10 +20,10 @@ export async function POST(request: NextRequest) {
   }
 
   const item: Record<string, AttributeValue> = {
-    PK: { S: `USER#${email}` },
+    PK: { S: `USER#${username}` },
     SK: { S: `LIST#${uuid()}` },
     title: { S: title },
-    managedBy: { S: `USER#${email}` },
+    managedBy: { S: `USER#${username}` },
   };
 
   if (description) {

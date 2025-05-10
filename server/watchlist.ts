@@ -3,16 +3,16 @@ import { QueryCommand, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 
 export const checkHasAccess = async (
   id: string,
-  email: string,
+  username: string,
 ): Promise<false | QueryCommandOutput> => {
   return dbclient
     .send(
       new QueryCommand(
         createParams({
           Limit: 1,
-          KeyConditionExpression: 'PK = :email AND SK = :watchlist',
+          KeyConditionExpression: 'PK = :username AND SK = :watchlist',
           ExpressionAttributeValues: {
-            ':email': { S: `USER#${email}` },
+            ':username': { S: `USER#${username}` },
             ':watchlist': { S: `LIST#${id}` },
           },
         }),

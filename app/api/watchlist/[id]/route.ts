@@ -8,19 +8,19 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { email } = JSON.parse(
+  const { username } = JSON.parse(
     decodeURIComponent(request.cookies.get('info')?.value || '{}'),
   );
   const { id } = await params;
 
-  if (!(await checkHasAccess(id, email))) {
+  if (!(await checkHasAccess(id, username))) {
     return NextResponse.json(
       { _message: 'Watchlist does not exist or you do not have access' },
       { status: 403 },
     );
   }
 
-  return checkHasAccess(id, email).then((response) => {
+  return checkHasAccess(id, username).then((response) => {
     if (response && response.Items) {
       return NextResponse.json({
         watchlist: itemToWatchlist(parseItemsArray(response.Items)[0]),
@@ -38,12 +38,12 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { email } = JSON.parse(
+  const { username } = JSON.parse(
     decodeURIComponent(request.cookies.get('info')?.value || '{}'),
   );
   const { id } = await params;
 
-  if (!(await checkHasAccess(id, email))) {
+  if (!(await checkHasAccess(id, username))) {
     return NextResponse.json(
       { _message: 'Watchlist does not exist or you do not have access' },
       { status: 403 },
@@ -64,7 +64,7 @@ export async function PATCH(
       new UpdateItemCommand(
         createParams({
           Key: {
-            PK: { S: `USER#${email}` },
+            PK: { S: `USER#${username}` },
             SK: { S: `LIST#${id}` },
           },
           UpdateExpression: 'SET #TITLE = :title, #DESCRIPTION = :description',

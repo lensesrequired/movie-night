@@ -4,7 +4,7 @@ import { QueryCommand } from '@aws-sdk/client-dynamodb';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const { email } = JSON.parse(
+  const { username } = JSON.parse(
     decodeURIComponent(request.cookies.get('info')?.value || '{}'),
   );
 
@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
         createParams({
           Limit: 100,
           KeyConditionExpression:
-            'PK = :email AND begins_with(SK, :watchlistPrefix)',
+            'PK = :username AND begins_with(SK, :watchlistPrefix)',
           ExpressionAttributeValues: {
-            ':email': { S: `USER#${email}` },
+            ':username': { S: `USER#${username}` },
             ':watchlistPrefix': { S: 'LIST' },
           },
         }),

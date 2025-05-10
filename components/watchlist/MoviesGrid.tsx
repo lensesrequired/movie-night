@@ -55,7 +55,7 @@ export const MoviesGrid = ({
   };
 
   return (
-    <Box sx={{ p: 3, width: '100%' }}>
+    <Box sx={{ pt: 3, width: '100%' }}>
       {isLoading ? (
         <Skeleton width="50%" height="2.5rem" />
       ) : (

@@ -28,9 +28,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const { email, password } = await request.json();
+  const { username, password } = await request.json();
 
-  if (!email || !password) {
+  if (!username || !password) {
     return NextResponse.json(
       { _message: 'username and password are required fields' },
       { status: 400 },
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       new GetItemCommand(
         createParams({
           Key: {
-            PK: { S: `USER#${email}` },
+            PK: { S: `USER#${username}` },
             SK: { S: '#PROFILE' },
           },
         }),
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
           const match = bcrypt.compareSync(password, savedPassword.S || '');
           if (match) {
             const token = jwt.sign(
-              { authed: true, email, displayName: displayName.S },
+              { authed: true, username, displayName: displayName.S },
               process.env.JWT_SECRET as jwt.Secret,
               {
                 expiresIn: 60 * 60 * 24,

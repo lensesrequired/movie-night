@@ -1,6 +1,6 @@
 export type AuthProps = {
   authed: boolean;
-  email: string;
+  username: string;
   displayName: string;
 };
 

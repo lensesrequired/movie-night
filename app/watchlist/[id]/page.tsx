@@ -4,11 +4,11 @@ import { AuthProps } from '@/types';
 
 async function WatchlistPage({
   params,
-  email,
+  username,
 }: { params: Promise<{ id: string }> } & AuthProps) {
   const { id } = await params;
 
-  return <WatchlistDetails id={id} email={email} />;
+  return <WatchlistDetails id={id} username={username} />;
 }
 
 export default withAuth(WatchlistPage);

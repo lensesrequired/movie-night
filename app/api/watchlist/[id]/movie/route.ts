@@ -9,12 +9,12 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { email } = JSON.parse(
+  const { username } = JSON.parse(
     decodeURIComponent(request.cookies.get('info')?.value || '{}'),
   );
   const { id } = await params;
 
-  if (!(await checkHasAccess(id, email))) {
+  if (!(await checkHasAccess(id, username))) {
     return NextResponse.json(
       { _message: 'Watchlist does not exist or you do not have access' },
       { status: 403 },
@@ -56,7 +56,7 @@ export async function PUT(
           SK: { S: `LIST#${id}` },
           title: { S: title },
           posterPath: { S: posterPath },
-          addedBy: { S: `USER#${email}` },
+          addedBy: { S: `USER#${username}` },
           dateAdded: { N: new Date().getTime().toString() },
         };
         if (releaseDate) {

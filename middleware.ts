@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
       authCookie?.value,
       process.env.JWT_SECRET as jwt.Secret,
     ) as jwt.JwtPayload;
-    if (!token.authed || !token.email) {
+    if (!token.authed || !token.username) {
       return NextResponse.json(
         { _message: 'Login again to perform this action' },
         { status: 401 },

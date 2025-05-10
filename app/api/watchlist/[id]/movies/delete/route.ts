@@ -7,13 +7,13 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { email } = JSON.parse(
+  const { username } = JSON.parse(
     decodeURIComponent(request.cookies.get('info')?.value || '{}'),
   );
   const { id } = await params;
   const { movies } = await request.json();
 
-  if (!(await checkHasAccess(id, email))) {
+  if (!(await checkHasAccess(id, username))) {
     return NextResponse.json(
       { _message: 'Watchlist does not exist or you do not have access' },
       { status: 403 },

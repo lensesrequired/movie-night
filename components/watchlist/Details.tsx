@@ -10,9 +10,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Alert, Box, Button, Skeleton } from '@mui/material';
 import { WatchlistModal } from './Modal';
 
-type WatchlistDetailsProps = { id: string; email: string };
+type WatchlistDetailsProps = { id: string; username: string };
 
-export function WatchlistDetails({ id, email }: WatchlistDetailsProps) {
+export function WatchlistDetails({ id, username }: WatchlistDetailsProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMovies, setIsLoadingMovies] = useState(true);
   const [error, setError] = useState<string>('');
@@ -83,7 +83,7 @@ export function WatchlistDetails({ id, email }: WatchlistDetailsProps) {
             >
               <h1>{watchlist.title}</h1>
               <Box sx={{ display: 'flex', gap: 1, flexDirection: 'row' }}>
-                {watchlist.manager === email && (
+                {watchlist.manager === username && (
                   <Button
                     variant="outlined"
                     startIcon={<EditIcon />}
