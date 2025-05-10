@@ -50,7 +50,7 @@ export async function PATCH(
     );
   }
 
-  const { title, description } = await request.json();
+  const { title, description, allowInvites } = await request.json();
 
   if (!title) {
     return NextResponse.json(
@@ -67,14 +67,17 @@ export async function PATCH(
             PK: { S: `USER#${username}` },
             SK: { S: `LIST#${id}` },
           },
-          UpdateExpression: 'SET #TITLE = :title, #DESCRIPTION = :description',
+          UpdateExpression:
+            'SET #TITLE = :title, #DESCRIPTION = :description, #ALLOW_INVITES = :allowInvites',
           ExpressionAttributeNames: {
             '#TITLE': 'title',
             '#DESCRIPTION': 'description',
+            '#ALLOW_INVITES': 'allowInvites',
           },
           ExpressionAttributeValues: {
             ':title': { S: title },
             ':description': { S: description },
+            ':allowInvites': { B: allowInvites },
           },
         }),
       ),

@@ -11,6 +11,8 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export type WatchlistModalProps = {
   onClose: () => void;
@@ -27,12 +29,15 @@ export const WatchlistModal = ({
   const [description, setDescription] = useState<string>(
     defaults?.description || '',
   );
+  const [allowInvites, setAllowInvites] = useState<boolean>(
+    defaults?.allowInvites || false,
+  );
   const [error, setError] = useState<string>('');
 
   const onSubmit = async () => {
     apiFetch(`/api/watchlist${defaults?.id ? `/${defaults.id}` : ''}`, {
       method: defaults ? 'PATCH' : 'POST',
-      body: JSON.stringify({ title, description }),
+      body: JSON.stringify({ title, description, allowInvites }),
     }).then(({ ok, data, error }) => {
       if (ok && data.success) {
         onSuccess();
@@ -45,7 +50,9 @@ export const WatchlistModal = ({
 
   return (
     <Dialog open onClose={onClose} aria-labelledby="create-dialog-title">
-      <DialogTitle id="create-dialog-title">Create a Watchlist</DialogTitle>
+      <DialogTitle id="create-dialog-title">
+        {defaults ? 'Edit Watchlist' : 'Create Watchlist'}
+      </DialogTitle>
       <DialogContent>
         <Box
           sx={{
@@ -71,6 +78,17 @@ export const WatchlistModal = ({
             variant="outlined"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={allowInvites}
+                onClick={(e) => {
+                  setAllowInvites((e.target as HTMLInputElement).checked);
+                }}
+              />
+            }
+            label="Allow other members to invite?"
           />
         </Box>
       </DialogContent>

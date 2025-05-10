@@ -9,6 +9,7 @@ export type Watchlist = {
   title: string;
   description?: string;
   manager: string;
+  allowInvites?: boolean;
 };
 
 export type WatchlistMovie = {

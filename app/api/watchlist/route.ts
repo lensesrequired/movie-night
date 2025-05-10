@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   );
   console.log('post', username);
 
-  const { title, description } = await request.json();
+  const { title, description, allowInvites } = await request.json();
 
   if (!title) {
     return NextResponse.json(
@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
     SK: { S: `LIST#${uuid()}` },
     title: { S: title },
     managedBy: { S: `USER#${username}` },
+    allowInvites: { B: allowInvites || false },
   };
 
   if (description) {
