@@ -31,3 +31,15 @@ export const checkHasAccess = async (
       return false;
     });
 };
+
+export const createInviteCode = (length = 32) => {
+  const chars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-._-';
+  let result = '';
+  const randomArray = new Uint8Array(length);
+  crypto.getRandomValues(randomArray);
+  randomArray.forEach((number) => {
+    result += chars[number % chars.length];
+  });
+  return result;
+};

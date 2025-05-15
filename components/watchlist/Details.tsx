@@ -1,12 +1,14 @@
 'use client';
 
 import { MovieModal } from '@/components/movie/Modal';
+import { InviteCodeModal } from '@/components/watchlist/InviteCodeModal';
 import { MoviesGrid } from '@/components/watchlist/MoviesGrid';
 import { apiFetch } from '@/helpers/fetch';
 import { Watchlist, WatchlistMovie } from '@/types';
 import { useEffect, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Alert, Box, Button, Skeleton } from '@mui/material';
 import { WatchlistModal } from './Modal';
 
@@ -20,6 +22,8 @@ export function WatchlistDetails({ id, username }: WatchlistDetailsProps) {
   const [movies, setMovies] = useState<WatchlistMovie[]>([]);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showMovieModal, setShowMovieModal] = useState<boolean>(false);
+  const [showInviteCodeModal, setShowInviteCodeModal] =
+    useState<boolean>(false);
 
   const retrieveWatchlist = () => {
     setIsLoading(true);
@@ -70,6 +74,14 @@ export function WatchlistDetails({ id, username }: WatchlistDetailsProps) {
           onSuccess={retrieveMovies}
         />
       )}
+      {showInviteCodeModal && (
+        <InviteCodeModal
+          watchlistId={id}
+          onClose={() => {
+            setShowInviteCodeModal(false);
+          }}
+        />
+      )}
       <Box sx={{ m: 3 }}>
         {watchlist ? (
           <Box sx={{ display: 'grid', gap: 1 }}>
@@ -91,7 +103,18 @@ export function WatchlistDetails({ id, username }: WatchlistDetailsProps) {
                       setShowEditModal(true);
                     }}
                   >
-                    Edit Watchlist
+                    Edit
+                  </Button>
+                )}
+                {(watchlist.manager === username || watchlist.allowInvites) && (
+                  <Button
+                    variant="outlined"
+                    startIcon={<PersonAddIcon />}
+                    onClick={() => {
+                      setShowInviteCodeModal(true);
+                    }}
+                  >
+                    Invite
                   </Button>
                 )}
                 <Button

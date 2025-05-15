@@ -52,3 +52,8 @@ export type TMDBMovieResponse = {
   total_pages: number;
   total_results: number;
 };
+
+export type InviteCode = {
+  code: string;
+  expiresAt: string;
+};
