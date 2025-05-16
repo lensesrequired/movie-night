@@ -1,14 +1,16 @@
 'use client';
 
 import { apiFetch } from '@/helpers/fetch';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Box, Button, TextField } from '@mui/material';
 
 type AuthProps = {
   createAccount?: boolean;
+  redirectTo?: string;
 };
 
-export const Auth = ({ createAccount }: AuthProps) => {
+export const Auth = ({ createAccount, redirectTo }: AuthProps) => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [email, setEmail] = useState<string>('');
@@ -51,7 +53,7 @@ export const Auth = ({ createAccount }: AuthProps) => {
       }).then(({ ok, data, error }) => {
         if (ok && data.authed) {
           if (createAccount) {
-            window.location.assign('/');
+            window.location.assign(decodeURIComponent(redirectTo || '') || '/');
           } else {
             window.location.reload();
           }
@@ -64,9 +66,11 @@ export const Auth = ({ createAccount }: AuthProps) => {
 
   const redirect = () => {
     if (createAccount) {
-      window.location.assign('/');
+      window.location.assign(redirectTo || '/');
     } else {
-      window.location.assign('/signup');
+      window.location.assign(
+        `/signup${redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ''}`,
+      );
     }
   };
 

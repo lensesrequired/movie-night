@@ -37,6 +37,7 @@ export const config = {
     '/api/watchlist/:id/movie',
     '/api/watchlist/:id/movies',
     '/api/watchlist/:id/movies/delete',
+    '/api/watchlist/join',
   ],
   runtime: 'nodejs',
 };
