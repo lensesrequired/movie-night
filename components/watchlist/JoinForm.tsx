@@ -19,8 +19,8 @@ export const JoinForm = ({ defaultCode }: JoinFormProps) => {
       method: 'POST',
       body: JSON.stringify({ code }),
     }).then(({ ok, data, error }) => {
-      if (ok && data.success) {
-        // TODO
+      if (ok && data.watchlistId) {
+        window.location.assign(`/watchlist/${data.watchlistId}`);
       } else if (error) {
         setError(error);
       }

@@ -1,5 +1,10 @@
 import { itemToWatchlist } from '@/helpers/watchlist';
-import { createParams, dbclient, parseItemsArray } from '@/server/dynamodb';
+import {
+  createParams,
+  dbclient,
+  parseItemsArray,
+  simplifyItem,
+} from '@/server/dynamodb';
 import { checkHasAccess } from '@/server/watchlist';
 import { UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,25 +18,41 @@ export async function GET(
   );
   const { id } = await params;
 
-  if (!(await checkHasAccess(id, username))) {
+  const watchlistResponse = await checkHasAccess(id, username);
+  if (!watchlistResponse) {
     return NextResponse.json(
       { _message: 'Watchlist does not exist or you do not have access' },
       { status: 403 },
     );
   }
 
-  return checkHasAccess(id, username).then((response) => {
-    if (response && response.Items) {
+  if (watchlistResponse.Items) {
+    const ownWatchlist = simplifyItem(watchlistResponse.Items[0]);
+    const managedBy = ownWatchlist.managedBy.replace('USER#', '');
+    if (managedBy === username) {
       return NextResponse.json({
-        watchlist: itemToWatchlist(parseItemsArray(response.Items)[0]),
+        watchlist: itemToWatchlist(ownWatchlist),
+      });
+    } else {
+      return checkHasAccess(id, managedBy).then((response) => {
+        if (response && response.Items) {
+          return NextResponse.json({
+            watchlist: itemToWatchlist(parseItemsArray(response.Items)[0]),
+          });
+        }
+
+        return NextResponse.json(
+          { _message: 'Watchlist does not exist' },
+          { status: 404 },
+        );
       });
     }
+  }
 
-    return NextResponse.json(
-      { _message: 'Watchlist does not exist or you do not have access' },
-      { status: 403 },
-    );
-  });
+  return NextResponse.json(
+    { _message: 'Watchlist does not exist or you do not have access' },
+    { status: 403 },
+  );
 }
 
 export async function PATCH(
