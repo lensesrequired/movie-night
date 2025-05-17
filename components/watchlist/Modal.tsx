@@ -34,8 +34,10 @@ export const WatchlistModal = ({
     defaults?.allowInvites || false,
   );
   const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit = async () => {
+    setIsLoading(true);
     apiFetch(`/api/watchlist${defaults?.id ? `/${defaults.id}` : ''}`, {
       method: defaults ? 'PATCH' : 'POST',
       body: JSON.stringify({ title, description, allowInvites }),
@@ -46,6 +48,7 @@ export const WatchlistModal = ({
       } else {
         setError(error || 'Something went wrong. Please try again.');
       }
+      setIsLoading(false);
     });
   };
 
@@ -69,8 +72,14 @@ export const WatchlistModal = ({
             label="Title"
             variant="outlined"
             value={title}
+            disabled={Boolean(defaults?.title)}
             onChange={(e) => setTitle(e.target.value)}
             required
+            helperText={
+              defaults?.title
+                ? ''
+                : 'Title will not be able to be edited once created'
+            }
           />
           <TextField
             id="description"
@@ -105,6 +114,7 @@ export const WatchlistModal = ({
           onClick={onSubmit}
           disabled={!title}
           autoFocus
+          loading={isLoading}
         >
           {defaults ? 'Save' : 'Create'}
         </Button>

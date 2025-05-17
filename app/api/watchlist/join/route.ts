@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
                 PK: { S: `USER#${username}` },
                 SK: { S: watchlistKey },
                 managedBy: { S: watchlist.managedBy },
+                title: { S: watchlist.title },
               };
 
               return dbclient

@@ -98,7 +98,7 @@ export async function PATCH(
           ExpressionAttributeValues: {
             ':title': { S: title },
             ':description': { S: description },
-            ':allowInvites': { B: allowInvites },
+            ':allowInvites': { BOOL: allowInvites },
           },
         }),
       ),

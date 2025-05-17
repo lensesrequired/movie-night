@@ -28,8 +28,8 @@ export const simplify = (data: Record<string, any>): Record<string, any> => {
     );
   } else if (data.S || data.S === '') {
     return data.S;
-  } else if (data.B || data.B === false) {
-    return data.B;
+  } else if (data.BOOL || data.BOOL === false) {
+    return data.BOOL;
   }
   return data;
 };

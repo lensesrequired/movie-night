@@ -29,8 +29,6 @@ export const MembersTable = ({ watchlistId, managedBy }: MembersTableProps) => {
     apiFetch(`/api/watchlist/${watchlistId}/members`).then(
       ({ ok, data, error }) => {
         if (ok && data.members) {
-          console.log(managedBy);
-          console.log(data);
           setMembers(data.members);
         } else {
           setError(error || 'Something went wrong. Please try again.');
