@@ -1,3 +1,4 @@
+import { MembersTable } from '@/components/watchlist/MembersTable';
 import { apiFetch } from '@/helpers/fetch';
 import { Watchlist } from '@/types';
 import { useState } from 'react';
@@ -60,7 +61,6 @@ export const WatchlistModal = ({
             display: 'flex',
             flexDirection: 'column',
             gap: '1rem',
-            minWidth: '40vw', // TODO: mobile styles
           }}
         >
           {error && <Alert severity="error">{error}</Alert>}
@@ -91,6 +91,12 @@ export const WatchlistModal = ({
             label="Allow other members to invite?"
           />
         </Box>
+        {defaults?.id && (
+          <MembersTable
+            watchlistId={defaults?.id}
+            managedBy={defaults?.manager}
+          />
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>

@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
           .send(
             new QueryCommand(
               createParams({
-                Limit: 1,
+                Limit: 50,
                 IndexName: 'GSI1',
                 KeyConditionExpression:
                   'SK = :watchlist AND begins_with(PK, :userPrefix)',
@@ -65,6 +65,15 @@ export async function POST(request: NextRequest) {
           )
           .then((watchlistResponse) => {
             if (watchlistResponse.Items && watchlistResponse.Items.length) {
+              if (watchlistResponse.Items.length === 50) {
+                return NextResponse.json(
+                  {
+                    _message:
+                      'This watchlist has reached its maximum capacity (50)',
+                  },
+                  { status: 400 },
+                );
+              }
               const watchlist = simplifyItem(watchlistResponse.Items[0]);
               const item: Record<string, AttributeValue> = {
                 PK: { S: `USER#${username}` },

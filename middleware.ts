@@ -34,6 +34,7 @@ export const config = {
     '/api/watchlist',
     '/api/watchlist/:id',
     '/api/watchlist/:id/invite',
+    '/api/watchlist/:id/members',
     '/api/watchlist/:id/movie',
     '/api/watchlist/:id/movies',
     '/api/watchlist/:id/movies/delete',
