@@ -1,3 +1,4 @@
+import PickMovieDropdown from '@/components/watchlist/PickMovieDropdown';
 import { apiFetch } from '@/helpers/fetch';
 import { WatchlistMovie } from '@/types';
 import Image from 'next/image';
@@ -60,7 +61,7 @@ export const MoviesGrid = ({
         <Skeleton width="50%" height="2.5rem" />
       ) : (
         <Box sx={{ display: 'flex', gap: 1, p: 1 }}>
-          <Button variant="contained">Start a Poll</Button>
+          <PickMovieDropdown />
           <Button variant="outlined" onClick={onSelect}>
             {selected.length ? 'Unselect All' : 'Select All'}
           </Button>
