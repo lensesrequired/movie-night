@@ -1,3 +1,7 @@
+export const MAX_INVITE_CODES = 10;
+export const MAX_MOVIES = 250;
+export const MAX_MEMBERS = 50;
+
 export enum PickOption {
   RANDOM_SELECTION = 'RANDOM_SELECTION',
   VOTING_STANDARD = 'VOTING_STANDARD',

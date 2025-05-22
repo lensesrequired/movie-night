@@ -1,3 +1,4 @@
+import { MAX_MOVIES } from '@/constants';
 import { itemsToWatchlistMovies } from '@/helpers/watchlist';
 import { createParams, dbclient } from '@/server/dynamodb';
 import { checkHasAccess } from '@/server/watchlist';
@@ -24,7 +25,7 @@ export async function GET(
     .send(
       new QueryCommand(
         createParams({
-          Limit: 100,
+          Limit: MAX_MOVIES,
           IndexName: 'GSI1',
           KeyConditionExpression:
             'SK = :watchlist AND begins_with(PK, :moviePrefix)',

@@ -1,3 +1,4 @@
+import { MAX_INVITE_CODES } from '@/constants';
 import {
   createParams,
   dbclient,
@@ -60,7 +61,7 @@ export async function GET(
     .send(
       new QueryCommand(
         createParams({
-          Limit: 10,
+          Limit: MAX_INVITE_CODES,
           KeyConditionExpression:
             'PK = :watchlistId AND begins_with(SK, :inviteCodePrefix)',
           ExpressionAttributeValues: {
@@ -135,7 +136,7 @@ export async function POST(
     const inviteCodeResp = await dbclient.send(
       new QueryCommand(
         createParams({
-          Limit: 10,
+          Limit: MAX_INVITE_CODES,
           KeyConditionExpression:
             'PK = :watchlistId AND begins_with(SK, :inviteCodePrefix)',
           ExpressionAttributeValues: {
@@ -149,8 +150,7 @@ export async function POST(
     if (inviteCodeResp.Items && inviteCodeResp.Items.length === 10) {
       return NextResponse.json(
         {
-          _message:
-            'The maximum number of invite codes have already been created',
+          _message: `The maximum number of invite codes have already been created ${MAX_INVITE_CODES}`,
         },
         { status: 400 },
       );

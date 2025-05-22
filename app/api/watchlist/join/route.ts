@@ -1,3 +1,4 @@
+import { MAX_MEMBERS } from '@/constants';
 import { createParams, dbclient, simplifyItem } from '@/server/dynamodb';
 import {
   DeleteItemCommand,
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
           .send(
             new QueryCommand(
               createParams({
-                Limit: 50,
+                Limit: MAX_MEMBERS,
                 IndexName: 'GSI1',
                 KeyConditionExpression:
                   'SK = :watchlist AND begins_with(PK, :userPrefix)',
@@ -68,8 +69,7 @@ export async function POST(request: NextRequest) {
               if (watchlistResponse.Items.length === 50) {
                 return NextResponse.json(
                   {
-                    _message:
-                      'This watchlist has reached its maximum capacity (50)',
+                    _message: `This watchlist has reached its maximum member capacity (${MAX_MEMBERS})`,
                   },
                   { status: 400 },
                 );
