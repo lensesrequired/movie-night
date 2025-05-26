@@ -1,10 +1,5 @@
 import { MAX_MOVIES } from '@/constants';
-import {
-  createParams,
-  dbclient,
-  simplify,
-  simplifyItem,
-} from '@/server/dynamodb';
+import { createParams, dbclient, simplifyItem } from '@/server/dynamodb';
 import { checkHasAccess } from '@/server/watchlist';
 import { TMDBMovieLookup } from '@/types';
 import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';

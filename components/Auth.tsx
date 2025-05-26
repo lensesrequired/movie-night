@@ -1,7 +1,6 @@
 'use client';
 
 import { apiFetch } from '@/helpers/fetch';
-import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Box, Button, TextField } from '@mui/material';
 

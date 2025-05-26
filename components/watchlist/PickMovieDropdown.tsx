@@ -11,7 +11,13 @@ import MenuList from '@mui/material/MenuList';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 
-export default function PickMovieDropdown() {
+export type PickMovieModalProps = {
+  watchlistId: string;
+};
+
+export default function PickMovieDropdown({
+  watchlistId,
+}: PickMovieModalProps) {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
   const [showPickMovieModal, setShowPickMovieModal] = useState<PickOption>();
@@ -38,7 +44,7 @@ export default function PickMovieDropdown() {
           onClose={() => {
             setShowPickMovieModal(undefined);
           }}
-          watchlistId=""
+          watchlistId={watchlistId}
           defaultChoice={showPickMovieModal}
         />
       )}

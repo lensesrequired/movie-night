@@ -1,4 +1,5 @@
 import { MoviePoolOption, PickOption, pickOptions } from '@/constants';
+import { apiFetch } from '@/helpers/fetch';
 import { useEffect, useState } from 'react';
 import {
   Alert,
@@ -55,7 +56,15 @@ export const PickMovieModal = ({
       pickType === PickOption.RANDOM_SELECTION &&
       moviePool === MoviePoolOption.ALL_MOVIES
     ) {
-      // get a movie
+      apiFetch(
+        `/api/watchlist/${watchlistId}/pick/random?pool=${moviePool}`,
+      ).then(({ ok, data, error }) => {
+        if (ok && data.movie) {
+          console.log(data.movie);
+        } else {
+          setError(error || 'Something went wrong. Please try again.');
+        }
+      });
     } else {
       // next screen
     }
