@@ -1,5 +1,6 @@
 import { Watchlist } from '@/types';
-import { Box, Button, Grid, Paper, Skeleton } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { Box, Skeleton } from '@mui/material';
 
 type WatchlistGridProps = {
   isLoading?: boolean;
@@ -10,34 +11,46 @@ export const WatchlistGrid = ({
   isLoading,
   watchlists,
 }: WatchlistGridProps) => {
+  const router = useRouter();
   return (
     <Box sx={{ p: 3, width: '100%' }}>
-      <Grid id="watchlist-grid" container spacing={2}>
-        {(isLoading ? Array(6).fill(null) : watchlists).map(
+      <Box sx={{ my: 2 }}>
+        {(isLoading ? Array(4).fill(null) : watchlists).map(
           (watchlist, index) => (
-            <Grid key={`watchlist-${watchlist?.id || index}`}>
+            <Box
+              key={`watchlist-${watchlist?.id || index}`}
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                my: 1,
+              }}
+              onClick={() => {
+                if (watchlist) {
+                  router.push(`/watchlist/${watchlist.id}`);
+                }
+              }}
+            >
               {watchlist ? (
-                <Button href={`/watchlist/${watchlist.id}`}>
-                  <Box sx={{ width: '130px', textAlign: 'center' }}>
-                    <Paper
-                      elevation={24}
-                      sx={{ width: '130px', height: '180px', mb: 1 }}
-                    >
-                      <Box sx={{ p: 2 }}>Title Artwork</Box>
-                    </Paper>
-                    {watchlist.title}
-                  </Box>
-                </Button>
-              ) : (
-                <Box sx={{ p: 1 }}>
-                  <Skeleton variant="rounded" width={130} height={180} />
-                  <Skeleton />
+                <Box
+                  sx={{
+                    width: '100%',
+                    p: 2,
+                    borderRadius: '0.5rem',
+                    border: '1px solid',
+                    borderColor: 'transparent',
+                    '&:hover': { backgroundColor: 'action.focus' },
+                  }}
+                >
+                  <h2>{watchlist.title}</h2>
+                  <h4>{watchlist.description}</h4>
                 </Box>
+              ) : (
+                <Skeleton width="100%" height="6rem" />
               )}
-            </Grid>
+            </Box>
           ),
         )}
-      </Grid>
+      </Box>
     </Box>
   );
 };

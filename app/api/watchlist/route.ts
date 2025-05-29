@@ -8,7 +8,6 @@ export async function POST(request: NextRequest) {
   const { username } = JSON.parse(
     decodeURIComponent(request.cookies.get('info')?.value || '{}'),
   );
-  console.log('post', username);
 
   const { title, description, allowInvites } = await request.json();
 
@@ -24,7 +23,7 @@ export async function POST(request: NextRequest) {
     SK: { S: `LIST#${uuid()}` },
     title: { S: title },
     managedBy: { S: `USER#${username}` },
-    allowInvites: { B: allowInvites || false },
+    allowInvites: { BOOL: allowInvites || false },
   };
 
   if (description) {

@@ -1,4 +1,6 @@
+import { PosterDisplay } from '@/components/movie/PosterDisplay';
 import PickMovieDropdown from '@/components/watchlist/PickMovieDropdown';
+import { MOVIE_POSTER_DIMENSIONS } from '@/constants';
 import { apiFetch } from '@/helpers/fetch';
 import { WatchlistMovie } from '@/types';
 import Image from 'next/image';
@@ -113,23 +115,15 @@ export const MoviesGrid = ({
               >
                 <Box
                   sx={{
-                    width: '150px',
+                    width: `${MOVIE_POSTER_DIMENSIONS.width}px`,
                     textAlign: 'center',
                     textTransform: 'initial',
                   }}
                 >
-                  <Paper
-                    className="overlay"
-                    elevation={24}
-                    sx={{ width: '150px', height: '225px', mb: 1 }}
-                  >
-                    <Image
-                      width={150}
-                      height={225}
-                      src={`https://image.tmdb.org/t/p/w500/${movie.posterPath}`}
-                      alt={`${movie.title} poster image`}
-                    />
-                  </Paper>
+                  <PosterDisplay
+                    src={`https://image.tmdb.org/t/p/w500/${movie.posterPath}`}
+                    altTitle={`${movie.title} poster image`}
+                  />
                   <Box
                     sx={{
                       display: 'absolute',
@@ -165,7 +159,11 @@ export const MoviesGrid = ({
               </Button>
             ) : (
               <Box sx={{ p: 1 }}>
-                <Skeleton variant="rounded" width={130} height={180} />
+                <Skeleton
+                  variant="rounded"
+                  width={MOVIE_POSTER_DIMENSIONS.width}
+                  height={MOVIE_POSTER_DIMENSIONS.height}
+                />
                 <Skeleton />
               </Box>
             )}
