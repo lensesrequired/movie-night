@@ -1,5 +1,3 @@
-import { PickMovieModal } from '@/components/watchlist/PickMovieModal';
-import { PickOption, pickOptions } from '@/constants';
 import { useRef, useState } from 'react';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Button from '@mui/material/Button';
@@ -11,16 +9,25 @@ import MenuList from '@mui/material/MenuList';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 
-export type PickMovieModalProps = {
-  watchlistId: string;
+enum CloseOption {
+  CLOSE,
+  SAVE_AND_CLOSE,
+  REMOVE_AND_CLOSE,
+}
+
+const closeOptions = [
+  { text: 'Close', value: CloseOption.CLOSE },
+  { text: 'Save for Later and Close', value: CloseOption.SAVE_AND_CLOSE },
+  { text: 'Remove Movie and Close', value: CloseOption.REMOVE_AND_CLOSE },
+];
+
+export type SaveDropdownProps = {
+  closeModal: () => void;
 };
 
-export default function PickMovieDropdown({
-  watchlistId,
-}: PickMovieModalProps) {
+export const SaveDropdown = ({ closeModal }: SaveDropdownProps) => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
-  const [showPickMovieModal, setShowPickMovieModal] = useState<PickOption>();
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -37,28 +44,24 @@ export default function PickMovieDropdown({
     setOpen(false);
   };
 
+  const onClick = (value: CloseOption) => () => {
+    if (value === CloseOption.SAVE_AND_CLOSE) {
+      // TODO
+    } else if (value === CloseOption.REMOVE_AND_CLOSE) {
+      // TODO
+    }
+    closeModal();
+  };
+
   return (
     <>
-      {showPickMovieModal && (
-        <PickMovieModal
-          onClose={() => {
-            setShowPickMovieModal(undefined);
-          }}
-          watchlistId={watchlistId}
-          defaultChoice={showPickMovieModal}
-        />
-      )}
       <ButtonGroup
-        variant="contained"
+        variant="outlined"
         ref={anchorRef}
         aria-label="Pick a Movie menu"
       >
-        <Button
-          onClick={() => {
-            setShowPickMovieModal(PickOption.RANDOM_SELECTION);
-          }}
-        >
-          Pick a Movie
+        <Button onClick={onClick(CloseOption.CLOSE)}>
+          {closeOptions[0].text}
         </Button>
         <Button
           size="small"
@@ -75,7 +78,6 @@ export default function PickMovieDropdown({
         sx={{ zIndex: 1 }}
         open={open}
         anchorEl={anchorRef.current}
-        role={undefined}
         transition
         disablePortal
       >
@@ -90,12 +92,10 @@ export default function PickMovieDropdown({
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu" autoFocusItem>
-                  {pickOptions.map(({ text, value }) => (
+                  {closeOptions.map(({ text, value }) => (
                     <MenuItem
-                      key={value}
-                      onClick={() => {
-                        setShowPickMovieModal(value);
-                      }}
+                      key={`close-option-${value}`}
+                      onClick={onClick(value)}
                     >
                       {text}
                     </MenuItem>
@@ -108,4 +108,4 @@ export default function PickMovieDropdown({
       </Popper>
     </>
   );
-}
+};

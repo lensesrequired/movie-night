@@ -1,0 +1,119 @@
+import { PosterDisplay } from '@/components/movie/PosterDisplay';
+import { usePickContext } from '@/components/movie/pick/Context';
+import { InitialForm } from '@/components/movie/pick/InitialForm';
+import { SaveDropdown } from '@/components/movie/pick/SaveDropdown';
+import { MoviePoolOption, PickOption } from '@/constants';
+import { apiFetch } from '@/helpers/fetch';
+import { WatchlistMovie } from '@/types';
+import { useEffect, useState } from 'react';
+import {
+  Alert,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from '@mui/material';
+
+export type PickModalProps = {
+  onClose: () => void;
+  watchlistId: string;
+};
+
+export const Modal = ({ onClose, watchlistId }: PickModalProps) => {
+  const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { pickName, pickType, moviePool } = usePickContext();
+  const [pickedMovie, setPickedMovie] = useState<WatchlistMovie>();
+  const [buttonText, setButtonText] = useState<string>('Next');
+
+  useEffect(() => {
+    if (pickedMovie) {
+      setButtonText('Show Me A(nother) Flick');
+    } else if (
+      pickType === PickOption.RANDOM_SELECTION &&
+      moviePool === MoviePoolOption.ALL_MOVIES
+    ) {
+      setButtonText('Show Me A Flick');
+    } else {
+      setButtonText('Next');
+    }
+  }, [moviePool, pickType, pickedMovie]);
+
+  const onSubmit = async () => {
+    if (
+      pickType === PickOption.RANDOM_SELECTION &&
+      moviePool === MoviePoolOption.ALL_MOVIES
+    ) {
+      setIsLoading(true);
+      apiFetch(
+        `/api/watchlist/${watchlistId}/pick/random?pool=${moviePool}`,
+      ).then(({ ok, data, error }) => {
+        if (ok && data.movie) {
+          setPickedMovie(data.movie);
+        } else {
+          setError(error || 'Something went wrong. Please try again.');
+        }
+        setIsLoading(false);
+      });
+    } else {
+      // next screen
+    }
+  };
+
+  return (
+    <Dialog open onClose={onClose} aria-labelledby="pick-movie-dialog-title">
+      <DialogTitle id="pick-movie-dialog-title">Pick a Flick</DialogTitle>
+      <DialogContent>
+        <Box
+          sx={{
+            pt: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+          }}
+        >
+          {error && <Alert severity="error">{error}</Alert>}
+          {pickedMovie ? (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                mx: 5,
+              }}
+            >
+              <PosterDisplay
+                src={`https://image.tmdb.org/t/p/w500/${pickedMovie.posterPath}`}
+                altTitle={`${pickedMovie.title} Poster`}
+              />
+              <h3>
+                {pickedMovie.title}
+                {pickedMovie.releaseDate &&
+                  ` (${new Date(pickedMovie.releaseDate).toLocaleDateString()})`}
+              </h3>
+            </Box>
+          ) : (
+            <InitialForm />
+          )}
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ ml: 10 }}>
+        <Button
+          variant="contained"
+          onClick={onSubmit}
+          loading={isLoading}
+          disabled={!pickName}
+        >
+          {buttonText}
+        </Button>
+        {pickedMovie ? (
+          <SaveDropdown closeModal={onClose} />
+        ) : (
+          <Button onClick={onClose}>Close</Button>
+        )}
+      </DialogActions>
+    </Dialog>
+  );
+};

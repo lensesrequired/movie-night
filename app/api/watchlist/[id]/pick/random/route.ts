@@ -30,7 +30,7 @@ export async function GET(
     );
   }
 
-  const n = Math.floor(Math.random() * (MAX_MOVIES - 1));
+  const n = Math.floor(Math.random() * MAX_MOVIES);
   return dbclient
     .send(
       new QueryCommand(
@@ -54,7 +54,7 @@ export async function GET(
           });
         }
 
-        const i = Math.floor(Math.random() * (response.Items.length - 1));
+        const i = Math.floor(Math.random() * response.Items.length);
         return NextResponse.json({
           movie: itemsToWatchlistMovies(response.Items)[i],
         });

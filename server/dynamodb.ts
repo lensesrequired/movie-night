@@ -15,7 +15,7 @@ export const createParams = <T>(attrs: Omit<T, 'TableName'>): T => {
   return { TableName: TABLE_NAME, ...attrs } as T;
 };
 
-export const simplify = (data: Record<string, any>): Record<string, any> => {
+export const simplify = (data: Record<string, any>): any => {
   if (data.L) {
     return data.L.map((item: Record<any, any>) => simplify(item));
   } else if (data.M) {
@@ -30,6 +30,8 @@ export const simplify = (data: Record<string, any>): Record<string, any> => {
     return data.S;
   } else if (data.BOOL || data.BOOL === false) {
     return data.BOOL;
+  } else if (data.N || data.N === 0) {
+    return parseInt(data.N, 10);
   }
   return data;
 };
