@@ -1,3 +1,6 @@
+import { PUT } from '@/app/api/watchlist/[id]/pick/route';
+import { usePickContext } from '@/components/movie/pick/Context';
+import { apiFetch } from '@/helpers/fetch';
 import { useRef, useState } from 'react';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Button from '@mui/material/Button';
@@ -23,11 +26,25 @@ const closeOptions = [
 
 export type SaveDropdownProps = {
   closeModal: () => void;
+  watchlistId: string;
+  movieId: string;
+  setError: (err: string) => void;
+  reloadMovies: () => void;
+  retrievePicks: () => void;
 };
 
-export const SaveDropdown = ({ closeModal }: SaveDropdownProps) => {
+export const SaveDropdown = ({
+  closeModal,
+  watchlistId,
+  movieId,
+  setError,
+  reloadMovies,
+  retrievePicks,
+}: SaveDropdownProps) => {
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const anchorRef = useRef<HTMLDivElement>(null);
+  const { pickName, pickType, moviePool } = usePickContext();
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -46,11 +63,36 @@ export const SaveDropdown = ({ closeModal }: SaveDropdownProps) => {
 
   const onClick = (value: CloseOption) => () => {
     if (value === CloseOption.SAVE_AND_CLOSE) {
-      // TODO
+      setIsLoading(true);
+      apiFetch(`/api/watchlist/${watchlistId}/pick`, {
+        method: 'PUT',
+        body: JSON.stringify({ name: pickName, pickType, moviePool, movieId }),
+      }).then(({ ok, data, error }) => {
+        if (ok && data.success) {
+          retrievePicks();
+          closeModal();
+        } else if (error) {
+          setError(error);
+        }
+        setIsLoading(false);
+      });
     } else if (value === CloseOption.REMOVE_AND_CLOSE) {
-      // TODO
+      setIsLoading(true);
+      apiFetch(`/api/watchlist/${watchlistId}/movies/delete`, {
+        method: 'POST',
+        body: JSON.stringify({ movies: [movieId] }),
+      }).then(({ ok, data, error }) => {
+        if (ok && data.success) {
+          reloadMovies();
+          closeModal();
+        } else if (error) {
+          setError(error);
+        }
+        setIsLoading(false);
+      });
+    } else {
+      closeModal();
     }
-    closeModal();
   };
 
   return (
@@ -60,7 +102,7 @@ export const SaveDropdown = ({ closeModal }: SaveDropdownProps) => {
         ref={anchorRef}
         aria-label="Pick a Movie menu"
       >
-        <Button onClick={onClick(CloseOption.CLOSE)}>
+        <Button loading={isLoading} onClick={onClick(CloseOption.CLOSE)}>
           {closeOptions[0].text}
         </Button>
         <Button

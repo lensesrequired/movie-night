@@ -1,3 +1,5 @@
+import { MoviePoolOption, PickOption } from '@/constants';
+
 export type AuthProps = {
   authed: boolean;
   username: string;
@@ -56,4 +58,13 @@ export type TMDBMovieResponse = {
 export type InviteCode = {
   code: string;
   expiresAt: string;
+};
+
+export type WatchlistPick = {
+  name: string;
+  expiresAt: string;
+  watchlistId: string;
+  pickType: PickOption;
+  moviePool: MoviePoolOption;
+  movie?: string;
 };

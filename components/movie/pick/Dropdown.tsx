@@ -1,8 +1,11 @@
 import { PickProvider } from '@/components/movie/pick/Context';
 import { Modal as PickModal } from '@/components/movie/pick/Modal';
 import { PickOption, pickOptions } from '@/constants';
-import { useRef, useState } from 'react';
+import { apiFetch } from '@/helpers/fetch';
+import { WatchlistPick } from '@/types';
+import { useEffect, useRef, useState } from 'react';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Box, Divider, Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
@@ -14,12 +17,19 @@ import Popper from '@mui/material/Popper';
 
 export type PickDropdownProps = {
   watchlistId: string;
+  reloadMovies: () => void;
 };
 
-export const PickDropdown = ({ watchlistId }: PickDropdownProps) => {
-  const [open, setOpen] = useState(false);
+export const PickDropdown = ({
+  watchlistId,
+  reloadMovies,
+}: PickDropdownProps) => {
   const anchorRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPickMovieModal, setShowPickMovieModal] = useState<PickOption>();
+  const [picks, setPicks] = useState<WatchlistPick[]>([]);
+  const [error, setError] = useState<string>('');
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -36,15 +46,35 @@ export const PickDropdown = ({ watchlistId }: PickDropdownProps) => {
     setOpen(false);
   };
 
+  const retrievePicks = async () => {
+    setIsLoading(true);
+    apiFetch(`/api/watchlist/${watchlistId}/picks`).then(
+      ({ ok, data, error }) => {
+        if (ok && data.picks) {
+          setPicks(data.picks);
+        } else {
+          setError(error || 'Something went wrong. Please try again.');
+        }
+        setIsLoading(false);
+      },
+    );
+  };
+
+  useEffect(() => {
+    retrievePicks();
+  }, []);
+
   return (
     <>
       {showPickMovieModal && (
         <PickProvider defaultPickType={showPickMovieModal}>
           <PickModal
+            retrievePicks={retrievePicks}
             onClose={() => {
               setShowPickMovieModal(undefined);
             }}
             watchlistId={watchlistId}
+            reloadMovies={reloadMovies}
           />
         </PickProvider>
       )}
@@ -100,6 +130,35 @@ export const PickDropdown = ({ watchlistId }: PickDropdownProps) => {
                       {text}
                     </MenuItem>
                   ))}
+                  {isLoading
+                    ? [
+                        <Divider key="watchlist-pick-divider" />,
+                        <Box key="watchlist-pick-loader" sx={{ px: 2 }}>
+                          <Skeleton />
+                        </Box>,
+                      ]
+                    : [
+                        <Divider key="watchlist-pick-divider" />,
+                        error && (
+                          <Box
+                            key="watchlist-pick-error"
+                            color="error.main"
+                            sx={{ px: 2 }}
+                          >
+                            {error}
+                          </Box>
+                        ),
+                        ...picks.map(({ name }, i) => (
+                          <MenuItem
+                            key={`watchlist-pick-${i}`}
+                            onClick={() => {
+                              console.log(name);
+                            }}
+                          >
+                            {name}
+                          </MenuItem>
+                        )),
+                      ]}
                 </MenuList>
               </ClickAwayListener>
             </Paper>

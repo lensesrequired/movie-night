@@ -1,6 +1,7 @@
 export const MAX_INVITE_CODES = 10;
 export const MAX_MOVIES = 250;
 export const MAX_MEMBERS = 50;
+export const MAX_PICKS = 10;
 
 export const MOVIE_POSTER_DIMENSIONS = { width: 150, height: 225 };
 

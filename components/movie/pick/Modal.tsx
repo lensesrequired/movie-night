@@ -19,14 +19,21 @@ import {
 export type PickModalProps = {
   onClose: () => void;
   watchlistId: string;
+  reloadMovies: () => void;
+  retrievePicks: () => void;
 };
 
-export const Modal = ({ onClose, watchlistId }: PickModalProps) => {
+export const Modal = ({
+  onClose,
+  watchlistId,
+  reloadMovies,
+  retrievePicks,
+}: PickModalProps) => {
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { pickName, pickType, moviePool } = usePickContext();
   const [pickedMovie, setPickedMovie] = useState<WatchlistMovie>();
   const [buttonText, setButtonText] = useState<string>('Next');
+  const { pickName, pickType, moviePool } = usePickContext();
 
   useEffect(() => {
     if (pickedMovie) {
@@ -109,7 +116,14 @@ export const Modal = ({ onClose, watchlistId }: PickModalProps) => {
           {buttonText}
         </Button>
         {pickedMovie ? (
-          <SaveDropdown closeModal={onClose} />
+          <SaveDropdown
+            closeModal={onClose}
+            watchlistId={watchlistId}
+            movieId={pickedMovie.tmdbId}
+            setError={setError}
+            reloadMovies={reloadMovies}
+            retrievePicks={retrievePicks}
+          />
         ) : (
           <Button onClick={onClose}>Close</Button>
         )}

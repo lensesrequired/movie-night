@@ -36,7 +36,6 @@ export async function POST(
       }),
     )
     .then((response) => {
-      console.log(response);
       if (response['$metadata'].httpStatusCode === 200) {
         return NextResponse.json({
           success: true,
