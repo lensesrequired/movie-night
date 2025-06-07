@@ -5,6 +5,11 @@ export const MAX_PICKS = 10;
 
 export const MOVIE_POSTER_DIMENSIONS = { width: 150, height: 225 };
 
+export enum DurationOption {
+  WEEK = 'WEEK',
+  DAY = 'DAY',
+}
+
 export enum PickOption {
   RANDOM_SELECTION = 'RANDOM_SELECTION',
   VOTING_STANDARD = 'VOTING_STANDARD',

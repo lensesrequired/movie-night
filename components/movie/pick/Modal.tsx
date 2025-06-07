@@ -16,6 +16,12 @@ import {
   DialogTitle,
 } from '@mui/material';
 
+enum FormPage {
+  INITIAL,
+  MOVIE_SELECTION,
+  VOTE,
+}
+
 export type PickModalProps = {
   onClose: () => void;
   watchlistId: string;
@@ -33,7 +39,8 @@ export const Modal = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pickedMovie, setPickedMovie] = useState<WatchlistMovie>();
   const [buttonText, setButtonText] = useState<string>('Next');
-  const { pickName, pickType, moviePool } = usePickContext();
+  const [formPage, setFormPage] = useState<FormPage>(FormPage.INITIAL);
+  const { pickName, pickType, moviePool, expiryOptions } = usePickContext();
 
   useEffect(() => {
     if (pickedMovie) {
@@ -43,8 +50,10 @@ export const Modal = ({
       moviePool === MoviePoolOption.ALL_MOVIES
     ) {
       setButtonText('Show Me A Flick');
+    } else if (moviePool === MoviePoolOption.ALL_MOVIES) {
+      setButtonText('Save Pick & Start Voting');
     } else {
-      setButtonText('Next');
+      setButtonText('Select Movies');
     }
   }, [moviePool, pickType, pickedMovie]);
 
@@ -64,9 +73,34 @@ export const Modal = ({
         }
         setIsLoading(false);
       });
+    } else if (moviePool === MoviePoolOption.ALL_MOVIES) {
+      setIsLoading(true);
+      apiFetch(`/api/watchlist/${watchlistId}/pick`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          name: pickName,
+          pickType,
+          moviePool,
+          expiryOptions,
+        }),
+      }).then(({ ok, data, error }) => {
+        if (ok && data.success) {
+          retrievePicks();
+          setFormPage(FormPage.VOTE);
+        } else if (error) {
+          setError(error);
+        }
+        setIsLoading(false);
+      });
     } else {
-      // next screen
+      // select movies screen
     }
+  };
+
+  const renderForm = () => {
+    if (formPage === FormPage.VOTE) {
+    }
+    return <InitialForm />;
   };
 
   return (
@@ -83,30 +117,34 @@ export const Modal = ({
         >
           {error && <Alert severity="error">{error}</Alert>}
           {pickedMovie ? (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                mx: 5,
-              }}
-            >
-              <PosterDisplay
-                src={`https://image.tmdb.org/t/p/w500/${pickedMovie.posterPath}`}
-                altTitle={`${pickedMovie.title} Poster`}
-              />
-              <h3>
-                {pickedMovie.title}
-                {pickedMovie.releaseDate &&
-                  ` (${new Date(pickedMovie.releaseDate).toLocaleDateString()})`}
-              </h3>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              Here&#39;s your selected flick! You can save it for later or
+              remove the movie from the list. If you save it for later, it will
+              be viewable for 1 week before the pick will expire.
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <PosterDisplay
+                  src={`https://image.tmdb.org/t/p/w500/${pickedMovie.posterPath}`}
+                  altTitle={`${pickedMovie.title} Poster`}
+                />
+                <h3>
+                  {pickedMovie.title}
+                  {pickedMovie.releaseDate &&
+                    ` (${new Date(pickedMovie.releaseDate).toLocaleDateString()})`}
+                </h3>
+              </Box>
             </Box>
           ) : (
             <InitialForm />
           )}
         </Box>
       </DialogContent>
-      <DialogActions sx={{ ml: 10 }}>
+      <DialogActions>
         <Button
           variant="contained"
           onClick={onSubmit}

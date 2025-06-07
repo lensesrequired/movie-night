@@ -1,4 +1,5 @@
-import { MoviePoolOption, PickOption } from '@/constants';
+import { DurationOption, MoviePoolOption, PickOption } from '@/constants';
+import { PickExpiryOptions } from '@/types';
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
 type PickContextType = {
@@ -8,6 +9,8 @@ type PickContextType = {
   setPickType: (type: PickOption) => void;
   moviePool: MoviePoolOption;
   setMoviePool: (pool: MoviePoolOption) => void;
+  expiryOptions: PickExpiryOptions;
+  setExpiryOptions: (expiryOptions: PickExpiryOptions) => void;
 };
 
 const Context = createContext<PickContextType | undefined>(undefined);
@@ -24,6 +27,10 @@ export const PickProvider = ({
   const [moviePool, setMoviePool] = useState<MoviePoolOption>(
     MoviePoolOption.ALL_MOVIES,
   );
+  const [expiryOptions, setExpiryOptions] = useState<PickExpiryOptions>({
+    count: 1,
+    type: DurationOption.WEEK,
+  });
 
   return (
     <Context.Provider
@@ -34,6 +41,8 @@ export const PickProvider = ({
         setPickType,
         moviePool,
         setMoviePool,
+        expiryOptions,
+        setExpiryOptions,
       }}
     >
       {children}

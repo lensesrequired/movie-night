@@ -69,12 +69,12 @@ export const PickDropdown = ({
       {showPickMovieModal && (
         <PickProvider defaultPickType={showPickMovieModal}>
           <PickModal
-            retrievePicks={retrievePicks}
             onClose={() => {
               setShowPickMovieModal(undefined);
             }}
             watchlistId={watchlistId}
             reloadMovies={reloadMovies}
+            retrievePicks={retrievePicks}
           />
         </PickProvider>
       )}

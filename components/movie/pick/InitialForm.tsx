@@ -1,6 +1,12 @@
 import { usePickContext } from '@/components/movie/pick/Context';
-import { MoviePoolOption, PickOption, pickOptions } from '@/constants';
 import {
+  DurationOption,
+  MoviePoolOption,
+  PickOption,
+  pickOptions,
+} from '@/constants';
+import {
+  Box,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -17,13 +23,16 @@ export const InitialForm = () => {
     pickName,
     pickType,
     moviePool,
+    expiryOptions,
     setPickName,
     setPickType,
     setMoviePool,
+    setExpiryOptions,
   } = usePickContext();
 
   return (
     <>
+      {/*TODO: verify not in list already*/}
       <TextField
         id="name"
         label="Pick Name"
@@ -52,11 +61,51 @@ export const InitialForm = () => {
           ))}
         </Select>
       </FormControl>
+      {[PickOption.VOTING_STANDARD, PickOption.VOTING_RANKED].includes(
+        pickType,
+      ) && (
+        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+          Allow voting for...&nbsp;
+          <Select
+            id="voting-duration-number-select"
+            value={expiryOptions.count}
+            onChange={(e) => {
+              setExpiryOptions({
+                count: e.target.value as number,
+                type: expiryOptions.type,
+              });
+            }}
+          >
+            {Array(expiryOptions.type === DurationOption.WEEK ? 2 : 7)
+              .fill(null)
+              .map((_, i) => (
+                <MenuItem
+                  key={`voting-duration-number-option-${i}`}
+                  value={i + 1}
+                >
+                  {i + 1}
+                </MenuItem>
+              ))}
+          </Select>
+          <Select
+            id="voting-duration-unit-select"
+            value={expiryOptions.type}
+            onChange={(e) => {
+              setExpiryOptions({
+                count: expiryOptions.count,
+                type: e.target.value as DurationOption,
+              });
+            }}
+          >
+            <MenuItem value={DurationOption.DAY}>Day(s)</MenuItem>
+            <MenuItem value={DurationOption.WEEK}>Week(s)</MenuItem>
+          </Select>
+        </Box>
+      )}
       <FormControl>
         <FormLabel id="movie-list-type-group-label">Movie Pool</FormLabel>
-        If you choose to Pick a Movie based off only Selected Movies, you will
-        be able to select those movies with the members of this wishlist or by
-        yourself on the next screen.
+        If you choose to Pick a Flick based off of only Selected Movies, you
+        will be able to select those movies on the next screen.
         <RadioGroup
           aria-labelledby="movie-list-type-group-label"
           name="movie-list-type-group"

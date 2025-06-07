@@ -1,4 +1,4 @@
-import { MoviePoolOption, PickOption } from '@/constants';
+import { DurationOption, MoviePoolOption, PickOption } from '@/constants';
 
 export type AuthProps = {
   authed: boolean;
@@ -68,3 +68,5 @@ export type WatchlistPick = {
   moviePool: MoviePoolOption;
   movie?: string;
 };
+
+export type PickExpiryOptions = { count: number; type: DurationOption };

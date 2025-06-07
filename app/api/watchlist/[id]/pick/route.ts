@@ -1,4 +1,4 @@
-import { MAX_PICKS } from '@/constants';
+import { DurationOption, MAX_PICKS } from '@/constants';
 import { createParams, dbclient, simplifyItem } from '@/server/dynamodb';
 import { checkHasAccess } from '@/server/watchlist';
 import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
@@ -21,7 +21,18 @@ export async function PUT(
     );
   }
 
-  const { name, pickType, moviePool, movieId } = await request.json();
+  const { name, pickType, moviePool, movieId, expiryOptions } =
+    await request.json();
+  const { count, type } = expiryOptions || {};
+
+  const today = new Date();
+  let expiry = new Date(today.setDate(today.getDate() + 7));
+  let ttl = new Date(today.setDate(today.getDate() + 7));
+  if (count || type) {
+    const days = type === DurationOption.DAY ? count : count * 7;
+    expiry = new Date(today.setDate(today.getDate() + days));
+    ttl = new Date(today.setDate(today.getDate() + days + 7));
+  }
 
   return dbclient
     .send(
@@ -58,13 +69,11 @@ export async function PUT(
             { status: 400 },
           );
         } else {
-          const today = new Date();
-          const nextWeek = new Date(today.setDate(today.getDate() + 7));
-
           const item: Record<string, AttributeValue> = {
             PK: { S: `LIST#${id}` },
             SK: { S: `PICK#${name}` },
-            ttl: { S: nextWeek.toISOString() },
+            ttl: { S: ttl.toISOString() },
+            votingExpiry: { S: expiry.toISOString() },
             pickType: { S: pickType },
             moviePool: { S: moviePool },
           };
