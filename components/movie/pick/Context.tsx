@@ -1,5 +1,5 @@
 import { DurationOption, MoviePoolOption, PickOption } from '@/constants';
-import { PickExpiryOptions } from '@/types';
+import { PickExpiryOptions, WatchlistMovie, WatchlistPick } from '@/types';
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
 type PickContextType = {
@@ -11,6 +11,8 @@ type PickContextType = {
   setMoviePool: (pool: MoviePoolOption) => void;
   expiryOptions: PickExpiryOptions;
   setExpiryOptions: (expiryOptions: PickExpiryOptions) => void;
+  existingPick?: WatchlistPick;
+  pickedMovie?: WatchlistMovie;
 };
 
 const Context = createContext<PickContextType | undefined>(undefined);
@@ -18,14 +20,20 @@ const Context = createContext<PickContextType | undefined>(undefined);
 export const PickProvider = ({
   children,
   defaultPickType,
+  existingPick,
+  pickedMovie,
 }: {
   children: ReactNode;
-  defaultPickType: PickOption;
+  defaultPickType?: PickOption;
+  existingPick?: WatchlistPick;
+  pickedMovie?: WatchlistMovie;
 }) => {
-  const [pickName, setPickName] = useState<string>('');
-  const [pickType, setPickType] = useState<PickOption>(defaultPickType);
+  const [pickName, setPickName] = useState<string>(existingPick?.name || '');
+  const [pickType, setPickType] = useState<PickOption>(
+    existingPick?.pickType || defaultPickType || PickOption.RANDOM_SELECTION,
+  );
   const [moviePool, setMoviePool] = useState<MoviePoolOption>(
-    MoviePoolOption.ALL_MOVIES,
+    existingPick?.moviePool || MoviePoolOption.ALL_MOVIES,
   );
   const [expiryOptions, setExpiryOptions] = useState<PickExpiryOptions>({
     count: 1,
@@ -43,6 +51,8 @@ export const PickProvider = ({
         setMoviePool,
         expiryOptions,
         setExpiryOptions,
+        existingPick,
+        pickedMovie,
       }}
     >
       {children}

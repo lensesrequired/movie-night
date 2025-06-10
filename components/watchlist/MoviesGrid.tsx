@@ -62,7 +62,11 @@ export const MoviesGrid = ({
         <Skeleton width="50%" height="2.5rem" />
       ) : (
         <Box sx={{ display: 'flex', gap: 1, p: 1 }}>
-          <PickDropdown watchlistId={watchlistId} reloadMovies={reloadMovies} />
+          <PickDropdown
+            watchlistId={watchlistId}
+            reloadMovies={reloadMovies}
+            movies={movies}
+          />
           <Button variant="outlined" onClick={onSelect}>
             {selected.length ? 'Unselect All' : 'Select All'}
           </Button>

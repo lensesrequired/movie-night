@@ -26,12 +26,12 @@ export async function PUT(
   const { count, type } = expiryOptions || {};
 
   const today = new Date();
-  let expiry = new Date(today.setDate(today.getDate() + 7));
-  let ttl = new Date(today.setDate(today.getDate() + 7));
+  let expiry = null;
+  let ttl = new Date(new Date().setDate(today.getDate() + 7));
   if (count || type) {
     const days = type === DurationOption.DAY ? count : count * 7;
-    expiry = new Date(today.setDate(today.getDate() + days));
-    ttl = new Date(today.setDate(today.getDate() + days + 7));
+    expiry = new Date(new Date().setDate(today.getDate() + days));
+    ttl = new Date(new Date().setDate(today.getDate() + days + 7));
   }
 
   return dbclient
@@ -72,12 +72,14 @@ export async function PUT(
           const item: Record<string, AttributeValue> = {
             PK: { S: `LIST#${id}` },
             SK: { S: `PICK#${name}` },
-            ttl: { S: ttl.toISOString() },
-            votingExpiry: { S: expiry.toISOString() },
+            ttl: { N: (Number(ttl) / 1000).toString() },
             pickType: { S: pickType },
             moviePool: { S: moviePool },
           };
 
+          if (expiry) {
+            item.votingExpiry = { N: (Number(expiry) / 1000).toString() };
+          }
           if (movieId) {
             item.movie = {
               S: movieId,

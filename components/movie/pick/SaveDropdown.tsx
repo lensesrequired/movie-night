@@ -1,4 +1,3 @@
-import { PUT } from '@/app/api/watchlist/[id]/pick/route';
 import { usePickContext } from '@/components/movie/pick/Context';
 import { apiFetch } from '@/helpers/fetch';
 import { useRef, useState } from 'react';
@@ -44,7 +43,7 @@ export const SaveDropdown = ({
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const anchorRef = useRef<HTMLDivElement>(null);
-  const { pickName, pickType, moviePool } = usePickContext();
+  const { pickName, pickType, moviePool, existingPick } = usePickContext();
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -62,7 +61,7 @@ export const SaveDropdown = ({
   };
 
   const onClick = (value: CloseOption) => () => {
-    if (value === CloseOption.SAVE_AND_CLOSE) {
+    if (value === CloseOption.SAVE_AND_CLOSE && !existingPick) {
       setIsLoading(true);
       apiFetch(`/api/watchlist/${watchlistId}/pick`, {
         method: 'PUT',
@@ -77,6 +76,7 @@ export const SaveDropdown = ({
         setIsLoading(false);
       });
     } else if (value === CloseOption.REMOVE_AND_CLOSE) {
+      // TODO: remove pick too if there's an existing one
       setIsLoading(true);
       apiFetch(`/api/watchlist/${watchlistId}/movies/delete`, {
         method: 'POST',

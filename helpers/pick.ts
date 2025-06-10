@@ -6,11 +6,12 @@ export const itemsToWatchlistPick = (
   items: Record<string, AttributeValue>[],
 ): WatchlistPick[] => {
   return items.map((item) => {
-    const { PK, SK, ttl, ...restPick } = simplifyItem(item);
+    const { PK, SK, ttl, votingExpiry, ...restPick } = simplifyItem(item);
 
     return {
       name: SK.replace('PICK#', ''),
-      expiresAt: ttl,
+      expiresAt: ttl * 1000,
+      votingExpiresAt: votingExpiry * 1000,
       watchlistId: PK.replace('LIST#', ''),
       ...restPick,
     } as WatchlistPick;

@@ -1,4 +1,3 @@
-import { itemsToWatchlistMovies } from '@/helpers/watchlist';
 import {
   createParams,
   dbclient,

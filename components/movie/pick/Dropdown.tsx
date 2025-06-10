@@ -2,8 +2,9 @@ import { PickProvider } from '@/components/movie/pick/Context';
 import { Modal as PickModal } from '@/components/movie/pick/Modal';
 import { PickOption, pickOptions } from '@/constants';
 import { apiFetch } from '@/helpers/fetch';
-import { WatchlistPick } from '@/types';
-import { useEffect, useRef, useState } from 'react';
+import { timeBetweenDates } from '@/helpers/time';
+import { WatchlistMovie, WatchlistPick } from '@/types';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Box, Divider, Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
@@ -18,17 +19,20 @@ import Popper from '@mui/material/Popper';
 export type PickDropdownProps = {
   watchlistId: string;
   reloadMovies: () => void;
+  movies: WatchlistMovie[];
 };
 
 export const PickDropdown = ({
   watchlistId,
   reloadMovies,
+  movies,
 }: PickDropdownProps) => {
   const anchorRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPickMovieModal, setShowPickMovieModal] = useState<PickOption>();
   const [picks, setPicks] = useState<WatchlistPick[]>([]);
+  const [existingPick, setExistingPick] = useState<WatchlistPick>();
   const [error, setError] = useState<string>('');
 
   const handleToggle = () => {
@@ -64,19 +68,28 @@ export const PickDropdown = ({
     retrievePicks();
   }, []);
 
+  const pickedMovie = useMemo(() => {
+    if (existingPick && existingPick.movie && movies) {
+      return movies.find(({ tmdbId }) => tmdbId === existingPick.movie);
+    }
+  }, [existingPick, movies]);
+
   return (
-    <>
-      {showPickMovieModal && (
-        <PickProvider defaultPickType={showPickMovieModal}>
-          <PickModal
-            onClose={() => {
-              setShowPickMovieModal(undefined);
-            }}
-            watchlistId={watchlistId}
-            reloadMovies={reloadMovies}
-            retrievePicks={retrievePicks}
-          />
-        </PickProvider>
+    <PickProvider
+      defaultPickType={showPickMovieModal}
+      existingPick={existingPick}
+      pickedMovie={pickedMovie}
+    >
+      {(showPickMovieModal || existingPick) && (
+        <PickModal
+          onClose={() => {
+            setShowPickMovieModal(undefined);
+            setExistingPick(undefined);
+          }}
+          watchlistId={watchlistId}
+          reloadMovies={reloadMovies}
+          retrievePicks={retrievePicks}
+        />
       )}
       <ButtonGroup
         variant="contained"
@@ -148,16 +161,51 @@ export const PickDropdown = ({
                             {error}
                           </Box>
                         ),
-                        ...picks.map(({ name }, i) => (
-                          <MenuItem
-                            key={`watchlist-pick-${i}`}
-                            onClick={() => {
-                              console.log(name);
-                            }}
-                          >
-                            {name}
-                          </MenuItem>
-                        )),
+                        ...picks.map(
+                          (
+                            {
+                              name,
+                              pickType,
+                              expiresAt,
+                              votingExpiresAt,
+                              ...rest
+                            },
+                            i,
+                          ) => {
+                            const expiresTime = timeBetweenDates(
+                              new Date(),
+                              new Date(expiresAt),
+                            );
+                            let expiryText = expiresTime
+                              ? `Expires in ${expiresTime}`
+                              : 'Expired';
+                            if (votingExpiresAt) {
+                              const votingExpiresTime = timeBetweenDates(
+                                new Date(),
+                                new Date(votingExpiresAt),
+                              );
+                              expiryText = votingExpiresTime
+                                ? `Voting ends in ${votingExpiresTime}`
+                                : 'Voting ended';
+                            }
+                            return (
+                              <MenuItem
+                                key={`watchlist-pick-${i}`}
+                                onClick={() => {
+                                  setExistingPick({
+                                    name,
+                                    pickType,
+                                    expiresAt,
+                                    votingExpiresAt,
+                                    ...rest,
+                                  });
+                                }}
+                              >
+                                {name} ({expiryText})
+                              </MenuItem>
+                            );
+                          },
+                        ),
                       ]}
                 </MenuList>
               </ClickAwayListener>
@@ -165,6 +213,6 @@ export const PickDropdown = ({
           </Grow>
         )}
       </Popper>
-    </>
+    </PickProvider>
   );
 };

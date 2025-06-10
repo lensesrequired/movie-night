@@ -2,6 +2,7 @@ import { PosterDisplay } from '@/components/movie/PosterDisplay';
 import { usePickContext } from '@/components/movie/pick/Context';
 import { InitialForm } from '@/components/movie/pick/InitialForm';
 import { SaveDropdown } from '@/components/movie/pick/SaveDropdown';
+import { VoteForm } from '@/components/movie/pick/VoteForm';
 import { MoviePoolOption, PickOption } from '@/constants';
 import { apiFetch } from '@/helpers/fetch';
 import { WatchlistMovie } from '@/types';
@@ -35,16 +36,27 @@ export const Modal = ({
   reloadMovies,
   retrievePicks,
 }: PickModalProps) => {
+  const {
+    pickName,
+    pickType,
+    moviePool,
+    expiryOptions,
+    pickedMovie: alreadyPickedMovie,
+    existingPick,
+  } = usePickContext();
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [pickedMovie, setPickedMovie] = useState<WatchlistMovie>();
+  const [pickedMovie, setPickedMovie] = useState<WatchlistMovie | null>(
+    alreadyPickedMovie || null,
+  );
   const [buttonText, setButtonText] = useState<string>('Next');
-  const [formPage, setFormPage] = useState<FormPage>(FormPage.INITIAL);
-  const { pickName, pickType, moviePool, expiryOptions } = usePickContext();
+  const [formPage, setFormPage] = useState<FormPage>(
+    existingPick ? FormPage.VOTE : FormPage.INITIAL,
+  );
 
   useEffect(() => {
     if (pickedMovie) {
-      setButtonText('Show Me A(nother) Flick');
+      setButtonText(alreadyPickedMovie ? '' : 'Show Me A(nother) Flick');
     } else if (
       pickType === PickOption.RANDOM_SELECTION &&
       moviePool === MoviePoolOption.ALL_MOVIES
@@ -55,7 +67,7 @@ export const Modal = ({
     } else {
       setButtonText('Select Movies');
     }
-  }, [moviePool, pickType, pickedMovie]);
+  }, [alreadyPickedMovie, moviePool, pickType, pickedMovie]);
 
   const onSubmit = async () => {
     if (
@@ -99,6 +111,7 @@ export const Modal = ({
 
   const renderForm = () => {
     if (formPage === FormPage.VOTE) {
+      return <VoteForm />;
     }
     return <InitialForm />;
   };
@@ -140,19 +153,21 @@ export const Modal = ({
               </Box>
             </Box>
           ) : (
-            <InitialForm />
+            renderForm()
           )}
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button
-          variant="contained"
-          onClick={onSubmit}
-          loading={isLoading}
-          disabled={!pickName}
-        >
-          {buttonText}
-        </Button>
+        {buttonText && (
+          <Button
+            variant="contained"
+            onClick={onSubmit}
+            loading={isLoading}
+            disabled={!pickName}
+          >
+            {buttonText}
+          </Button>
+        )}
         {pickedMovie ? (
           <SaveDropdown
             closeModal={onClose}

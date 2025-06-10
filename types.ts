@@ -62,7 +62,8 @@ export type InviteCode = {
 
 export type WatchlistPick = {
   name: string;
-  expiresAt: string;
+  expiresAt: number;
+  votingExpiresAt: number;
   watchlistId: string;
   pickType: PickOption;
   moviePool: MoviePoolOption;

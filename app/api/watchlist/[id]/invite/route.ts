@@ -75,7 +75,10 @@ export async function GET(
       return NextResponse.json({
         codes: (inviteCodeResp.Items || []).map((item) => {
           const { SK, ttl } = simplifyItem(item);
-          return { code: SK.replace('INVITE_CODE#', ''), expiresAt: ttl };
+          return {
+            code: SK.replace('INVITE_CODE#', ''),
+            expiresAt: ttl * 1000,
+          };
         }),
       });
     })
@@ -173,7 +176,7 @@ export async function POST(
           Item: {
             PK: { S: `LIST#${id}` },
             SK: { S: `INVITE_CODE#${inviteCode}` },
-            ttl: { S: nextWeek.toISOString() },
+            ttl: { N: (Number(nextWeek) / 1000).toString() },
           },
         }),
       ),

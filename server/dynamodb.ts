@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { AttributeValue } from '@aws-sdk/client-dynamodb/dist-types/models/models_0';
 import { fromEnv } from '@aws-sdk/credential-providers';
