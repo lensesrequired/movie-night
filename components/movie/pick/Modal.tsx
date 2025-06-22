@@ -28,6 +28,7 @@ export type PickModalProps = {
   watchlistId: string;
   reloadMovies: () => void;
   retrievePicks: () => void;
+  movies: WatchlistMovie[];
 };
 
 export const Modal = ({
@@ -35,6 +36,7 @@ export const Modal = ({
   watchlistId,
   reloadMovies,
   retrievePicks,
+  movies,
 }: PickModalProps) => {
   const {
     pickName,
@@ -62,6 +64,8 @@ export const Modal = ({
       moviePool === MoviePoolOption.ALL_MOVIES
     ) {
       setButtonText('Show Me A Flick');
+    } else if (formPage === FormPage.VOTE) {
+      setButtonText('Submit Votes');
     } else if (moviePool === MoviePoolOption.ALL_MOVIES) {
       setButtonText('Save Pick & Start Voting');
     } else {
@@ -111,7 +115,7 @@ export const Modal = ({
 
   const renderForm = () => {
     if (formPage === FormPage.VOTE) {
-      return <VoteForm />;
+      return <VoteForm movies={movies} />;
     }
     return <InitialForm />;
   };

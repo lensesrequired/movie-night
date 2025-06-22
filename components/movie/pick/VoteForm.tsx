@@ -1,28 +1,16 @@
 import { usePickContext } from '@/components/movie/pick/Context';
-import {
-  DurationOption,
-  MoviePoolOption,
-  PickOption,
-  pickOptions,
-} from '@/constants';
-import {
-  Box,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  InputLabel,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
-  TextField,
-} from '@mui/material';
+import { PickOption } from '@/constants';
+import { WatchlistMovie } from '@/types';
+import { Autocomplete, TextField } from '@mui/material';
 
-export const VoteForm = () => {
+export type VoteFormProps = {
+  movies: WatchlistMovie[];
+};
+
+export const VoteForm = ({ movies }: VoteFormProps) => {
   const {
     pickName,
     pickType,
-    moviePool,
     expiryOptions,
     setPickName,
     setPickType,
@@ -30,5 +18,65 @@ export const VoteForm = () => {
     setExpiryOptions,
   } = usePickContext();
 
-  return <>VOTE</>;
+  return (
+    <>
+      {pickType === PickOption.VOTING_RANKED &&
+        'Pick your top three choices (in order)'}
+      <Autocomplete
+        id="first-choice"
+        disableClearable
+        options={movies.map(({ title }) => title)}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            slotProps={{
+              input: {
+                ...params.InputProps,
+                type: 'search',
+              },
+            }}
+            label="First choice"
+          />
+        )}
+      />
+      {pickType === PickOption.VOTING_RANKED && (
+        <>
+          <Autocomplete
+            id="second-choice"
+            disableClearable
+            options={movies.map(({ title }) => title)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    type: 'search',
+                  },
+                }}
+                label="Second choice"
+              />
+            )}
+          />
+          <Autocomplete
+            id="third-choice"
+            disableClearable
+            options={movies.map(({ title }) => title)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    type: 'search',
+                  },
+                }}
+                label="Third choice"
+              />
+            )}
+          />
+        </>
+      )}
+    </>
+  );
 };

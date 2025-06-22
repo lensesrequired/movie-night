@@ -8,12 +8,8 @@ import {
 import {
   Box,
   FormControl,
-  FormControlLabel,
-  FormLabel,
   InputLabel,
   MenuItem,
-  Radio,
-  RadioGroup,
   Select,
   TextField,
 } from '@mui/material';
@@ -22,16 +18,15 @@ export const InitialForm = () => {
   const {
     pickName,
     pickType,
-    moviePool,
     expiryOptions,
     setPickName,
     setPickType,
-    setMoviePool,
     setExpiryOptions,
   } = usePickContext();
 
   return (
     <>
+      Enter a name for your Pick and choose a selection type.
       {/*TODO: verify not in list already*/}
       <TextField
         id="name"
@@ -102,30 +97,30 @@ export const InitialForm = () => {
           </Select>
         </Box>
       )}
-      <FormControl>
-        <FormLabel id="movie-list-type-group-label">Movie Pool</FormLabel>
-        If you choose to Pick a Flick based off of only Selected Movies, you
-        will be able to select those movies on the next screen.
-        <RadioGroup
-          aria-labelledby="movie-list-type-group-label"
-          name="movie-list-type-group"
-          value={moviePool}
-          onChange={(e) => {
-            setMoviePool(e.target.value as MoviePoolOption);
-          }}
-        >
-          <FormControlLabel
-            value={MoviePoolOption.ALL_MOVIES}
-            control={<Radio />}
-            label="All Movies"
-          />
-          <FormControlLabel
-            value={MoviePoolOption.SELECTED_MOVIES}
-            control={<Radio />}
-            label="Selected Movies"
-          />
-        </RadioGroup>
-      </FormControl>
+      {/*<FormControl>*/}
+      {/*  <FormLabel id="movie-list-type-group-label">Movie Pool</FormLabel>*/}
+      {/*  If you choose to Pick a Flick based off of only Selected Movies, you*/}
+      {/*  will be able to select those movies on the next screen.*/}
+      {/*  <RadioGroup*/}
+      {/*    aria-labelledby="movie-list-type-group-label"*/}
+      {/*    name="movie-list-type-group"*/}
+      {/*    value={moviePool}*/}
+      {/*    onChange={(e) => {*/}
+      {/*      setMoviePool(e.target.value as MoviePoolOption);*/}
+      {/*    }}*/}
+      {/*  >*/}
+      {/*    <FormControlLabel*/}
+      {/*      value={MoviePoolOption.ALL_MOVIES}*/}
+      {/*      control={<Radio />}*/}
+      {/*      label="All Movies"*/}
+      {/*    />*/}
+      {/*    <FormControlLabel*/}
+      {/*      value={MoviePoolOption.SELECTED_MOVIES}*/}
+      {/*      control={<Radio />}*/}
+      {/*      label="Selected Movies"*/}
+      {/*    />*/}
+      {/*  </RadioGroup>*/}
+      {/*</FormControl>*/}
     </>
   );
 };

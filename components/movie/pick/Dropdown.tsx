@@ -89,6 +89,7 @@ export const PickDropdown = ({
           watchlistId={watchlistId}
           reloadMovies={reloadMovies}
           retrievePicks={retrievePicks}
+          movies={movies}
         />
       )}
       <ButtonGroup
