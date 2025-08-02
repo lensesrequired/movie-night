@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "npm run api:gen && next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "api:gen": "npx next-openapi-gen generate"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.782.0",
@@ -19,9 +20,10 @@
     "cookie": "^1.0.2",
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
-    "next": "^15.3.1-canary.0",
+    "next": "^15.4.2-canary.27",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "swagger-ui-dist": "^5.27.1",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -38,6 +40,7 @@
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "next-openapi-gen": "^0.7.2",
     "prettier": "^3.5.3",
     "sass": "^1.86.3",
     "typescript": "^5"
