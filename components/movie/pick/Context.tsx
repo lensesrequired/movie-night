@@ -1,6 +1,12 @@
 import { DurationOption, MoviePoolOption, PickOption } from '@/constants';
 import { PickExpiryOptions, WatchlistMovie, WatchlistPick } from '@/types';
-import React, { ReactNode, createContext, useContext, useState } from 'react';
+import React, {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 type PickContextType = {
   pickName: string;
@@ -39,6 +45,14 @@ export const PickProvider = ({
     count: 1,
     type: DurationOption.WEEK,
   });
+
+  useEffect(() => {
+    setPickName(existingPick?.name || '');
+    setPickType(
+      existingPick?.pickType || defaultPickType || PickOption.RANDOM_SELECTION,
+    );
+    setMoviePool(existingPick?.moviePool || MoviePoolOption.ALL_MOVIES);
+  }, [defaultPickType, existingPick]);
 
   return (
     <Context.Provider

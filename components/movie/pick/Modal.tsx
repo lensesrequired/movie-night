@@ -55,6 +55,7 @@ export const Modal = ({
   const [formPage, setFormPage] = useState<FormPage>(
     existingPick ? FormPage.VOTE : FormPage.INITIAL,
   );
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   useEffect(() => {
     if (pickedMovie) {
@@ -71,51 +72,58 @@ export const Modal = ({
     } else {
       setButtonText('Select Movies');
     }
-  }, [alreadyPickedMovie, moviePool, pickType, pickedMovie]);
+  }, [alreadyPickedMovie, formPage, moviePool, pickType, pickedMovie]);
 
   const onSubmit = async () => {
-    if (
-      pickType === PickOption.RANDOM_SELECTION &&
-      moviePool === MoviePoolOption.ALL_MOVIES
-    ) {
-      setIsLoading(true);
-      apiFetch(
-        `/api/watchlist/${watchlistId}/pick/random?pool=${moviePool}`,
-      ).then(({ ok, data, error }) => {
-        if (ok && data.movie) {
-          setPickedMovie(data.movie);
-        } else {
-          setError(error || 'Something went wrong. Please try again.');
-        }
-        setIsLoading(false);
-      });
-    } else if (moviePool === MoviePoolOption.ALL_MOVIES) {
-      setIsLoading(true);
-      apiFetch(`/api/watchlist/${watchlistId}/pick`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          name: pickName,
-          pickType,
-          moviePool,
-          expiryOptions,
-        }),
-      }).then(({ ok, data, error }) => {
-        if (ok && data.success) {
-          retrievePicks();
-          setFormPage(FormPage.VOTE);
-        } else if (error) {
-          setError(error);
-        }
-        setIsLoading(false);
-      });
+    if (formPage === FormPage.INITIAL) {
+      if (
+        pickType === PickOption.RANDOM_SELECTION &&
+        moviePool === MoviePoolOption.ALL_MOVIES
+      ) {
+        setIsLoading(true);
+        apiFetch(
+          `/api/watchlist/${watchlistId}/pick/random?pool=${moviePool}`,
+        ).then(({ ok, data, error }) => {
+          if (ok && data.movie) {
+            setPickedMovie(data.movie);
+          } else {
+            setError(error || 'Something went wrong. Please try again.');
+          }
+          setIsLoading(false);
+        });
+      } else if (moviePool === MoviePoolOption.ALL_MOVIES) {
+        setIsLoading(true);
+        apiFetch(`/api/watchlist/${watchlistId}/pick`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            name: pickName,
+            pickType,
+            moviePool,
+            expiryOptions,
+          }),
+        }).then(({ ok, data, error }) => {
+          if (ok && data.success) {
+            retrievePicks();
+            setFormPage(FormPage.VOTE);
+          } else if (error) {
+            setError(error);
+          }
+          setIsLoading(false);
+        });
+      }
+    } else if (formPage === FormPage.VOTE) {
     } else {
       // select movies screen
     }
   };
 
+  useEffect(() => {
+    setDisabled(!pickName);
+  }, [pickName]);
+
   const renderForm = () => {
     if (formPage === FormPage.VOTE) {
-      return <VoteForm movies={movies} />;
+      return <VoteForm movies={movies} setDisabled={setDisabled} />;
     }
     return <InitialForm />;
   };
@@ -167,7 +175,7 @@ export const Modal = ({
             variant="contained"
             onClick={onSubmit}
             loading={isLoading}
-            disabled={!pickName}
+            disabled={disabled}
           >
             {buttonText}
           </Button>
