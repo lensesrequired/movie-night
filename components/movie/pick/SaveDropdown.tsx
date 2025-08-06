@@ -1,6 +1,6 @@
 import { usePickContext } from '@/components/movie/pick/Context';
 import { apiFetch } from '@/helpers/fetch';
-import { useRef, useState } from 'react';
+import { ReactNode, useRef, useState } from 'react';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
@@ -76,7 +76,6 @@ export const SaveDropdown = ({
         setIsLoading(false);
       });
     } else if (value === CloseOption.REMOVE_AND_CLOSE) {
-      // TODO: remove pick too if there's an existing one
       setIsLoading(true);
       apiFetch(`/api/watchlist/${watchlistId}/movies/delete`, {
         method: 'POST',
@@ -134,14 +133,19 @@ export const SaveDropdown = ({
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu" autoFocusItem>
-                  {closeOptions.map(({ text, value }) => (
-                    <MenuItem
-                      key={`close-option-${value}`}
-                      onClick={onClick(value)}
-                    >
-                      {text}
-                    </MenuItem>
-                  ))}
+                  {closeOptions.reduce((opts, { text, value }, i) => {
+                    if (!existingPick || i !== 1) {
+                      opts.push(
+                        <MenuItem
+                          key={`close-option-${value}`}
+                          onClick={onClick(value)}
+                        >
+                          {text}
+                        </MenuItem>,
+                      );
+                    }
+                    return opts;
+                  }, [] as ReactNode[])}
                 </MenuList>
               </ClickAwayListener>
             </Paper>

@@ -34,6 +34,7 @@ export const PickDropdown = ({
   const [picks, setPicks] = useState<WatchlistPick[]>([]);
   const [existingPick, setExistingPick] = useState<WatchlistPick>();
   const [error, setError] = useState<string>('');
+  const [movieLookup, setMovieLookup] = useState<WatchlistMovie>();
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -69,10 +70,29 @@ export const PickDropdown = ({
   }, []);
 
   const pickedMovie = useMemo(() => {
-    if (existingPick && existingPick.movie && movies) {
-      return movies.find(({ tmdbId }) => tmdbId === existingPick.movie);
+    if (movieLookup) {
+      return movieLookup;
     }
-  }, [existingPick, movies]);
+    if (existingPick && existingPick.movie && movies) {
+      const movieDetails = movies.find(
+        ({ tmdbId }) => tmdbId === existingPick.movie,
+      );
+      if (!movieDetails) {
+        apiFetch(`/api/movie?movieId=${existingPick.movie}`, {})
+          .then(({ ok, data, error }) => {
+            if (ok) {
+              return data;
+            } else if (error) {
+              setError(error);
+            }
+          })
+          .then((movieResult) => {
+            setMovieLookup(movieResult.results[0] as WatchlistMovie);
+          });
+      }
+      return movieDetails;
+    }
+  }, [existingPick, movies, movieLookup]);
 
   return (
     <PickProvider

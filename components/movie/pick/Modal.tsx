@@ -53,7 +53,9 @@ export const Modal = ({
   );
   const [buttonText, setButtonText] = useState<string>('Next');
   const [formPage, setFormPage] = useState<FormPage>(
-    existingPick ? FormPage.VOTE : FormPage.INITIAL,
+    existingPick && existingPick.pickType !== PickOption.RANDOM_SELECTION
+      ? FormPage.VOTE
+      : FormPage.INITIAL,
   );
   const [disabled, setDisabled] = useState<boolean>(false);
 
