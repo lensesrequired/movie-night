@@ -87,7 +87,7 @@ export const InviteCodeModal = ({
 
   const onCopy = (code: string, index: number) => () => {
     navigator.clipboard.writeText(
-      `http://localhost:3000/watchlist/join?code=${code}`,
+      `${process.env.BASE_ENV}/watchlist/join?code=${code}`,
     );
     setCopied(index);
     setTimeout(() => {

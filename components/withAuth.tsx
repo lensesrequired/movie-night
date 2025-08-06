@@ -7,7 +7,7 @@ export const getAuth = async (): Promise<AuthProps> => {
   const cookieStore = await cookies();
   const authCookie = cookieStore.get('auth');
 
-  return await fetch('http://localhost:3000/api/authenticate', {
+  return await fetch(`${process.env.BASE_URL}/api/authenticate`, {
     method: 'get',
     headers: {
       Cookie: `auth=${authCookie?.value || ''}`,
