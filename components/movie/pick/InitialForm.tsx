@@ -1,10 +1,5 @@
 import { usePickContext } from '@/components/movie/pick/Context';
-import {
-  DurationOption,
-  MoviePoolOption,
-  PickOption,
-  pickOptions,
-} from '@/constants';
+import { DurationOption, PickOption, pickOptions } from '@/constants';
 import {
   Box,
   FormControl,
