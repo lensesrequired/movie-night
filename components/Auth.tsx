@@ -1,7 +1,7 @@
 'use client';
 
 import { apiFetch } from '@/helpers/fetch';
-import { useCallback, useEffect, useState } from 'react';
+import { FormEventHandler, useCallback, useEffect, useState } from 'react';
 import { Alert, Box, Button, TextField } from '@mui/material';
 
 type AuthProps = {
@@ -40,7 +40,7 @@ export const Auth = ({ createAccount, redirectTo }: AuthProps) => {
     }
   }, [usernameError, isValid, emailError]);
 
-  const onLogin = (e) => {
+  const onLogin: FormEventHandler = (e) => {
     e.preventDefault();
     if (!isLoading) {
       setIsLoading(true);

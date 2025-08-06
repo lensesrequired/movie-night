@@ -5,7 +5,7 @@ import { SerializeOptions, serialize } from 'cookie';
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
 
-export const cookieSettings = (env: string) => ({
+const cookieSettings = (env: string) => ({
   httpOnly: true,
   path: '/',
   secure: env !== 'development',

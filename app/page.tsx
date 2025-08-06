@@ -10,4 +10,6 @@ async function Home({ authed }: AuthProps) {
   return <Auth />;
 }
 
+console.log(withAuth(Home, true));
+
 export default withAuth(Home, true);

@@ -21,7 +21,7 @@ export default function withAuth(
   Component: JSX.ElementType,
   noRedirect?: boolean,
 ) {
-  return async function WithAuth(props: Record<string, unknown>) {
+  return async function WithAuth(props: Record<string, never>) {
     // TODO: fix bug where account has been removed from DB but still shows logged in if cookie exists
     const auth = await getAuth();
 
