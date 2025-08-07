@@ -29,8 +29,9 @@ export const VoteForm = ({ movies, setDisabled }: VoteFormProps) => {
 
   return (
     <>
-      {pickType === PickOption.VOTING_RANKED &&
-        'Pick your top three choices (in order)'}
+      {pickType === PickOption.VOTING_RANKED
+        ? 'Vote for your top three choices (in order)'
+        : 'Vote for your top movie for this pick'}
       <Autocomplete
         id="first-choice"
         value={votes[0]}

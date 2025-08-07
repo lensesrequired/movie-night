@@ -19,7 +19,19 @@
         "bearerFormat": "JWT"
       }
     },
-    "schemas": {},
+    "schemas": {
+      "VoteParams": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "pickId": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "responses": {
       "400": {
         "description": "Bad Request",
@@ -548,6 +560,51 @@
           "Watchlist"
         ],
         "parameters": [],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/watchlist/{id}/pick/{pickId}/vote": {
+      "post": {
+        "operationId": "post-watchlist-{id}-pick-{pickId}-vote",
+        "summary": "Endpoint to submit a pick vote",
+        "description": "",
+        "tags": [
+          "Watchlist"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "123"
+          },
+          {
+            "in": "path",
+            "name": "pickId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "123"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
         "responses": {
           "400": {
             "$ref": "#/components/responses/400"

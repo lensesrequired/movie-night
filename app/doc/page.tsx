@@ -2,7 +2,7 @@ import ReactSwagger from '../../components/swagger';
 
 export default async function IndexPage() {
   return (
-    <section className="container">
+    <section className="swagger-container">
       <ReactSwagger />
     </section>
   );

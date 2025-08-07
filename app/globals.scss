@@ -28,8 +28,14 @@ a {
 
   .swagger-ui {
     filter: invert(88%) hue-rotate(180deg);
+    input {
+      color: black;
+    }
   }
   .swagger-ui .microlight {
     filter: invert(100%) hue-rotate(180deg);
+    input {
+      color: black;
+    }
   }
 }

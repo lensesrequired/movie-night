@@ -40,6 +40,7 @@ export const config = {
     '/api/watchlist/:id/movies/delete',
     '/api/watchlist/:id/pick',
     '/api/watchlist/:id/pick/random',
+    '/api/watchlist/:id/pick/:pickId/vote',
     '/api/watchlist/:id/picks',
     '/api/watchlist/join',
   ],

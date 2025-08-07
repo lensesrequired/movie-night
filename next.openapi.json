@@ -97,9 +97,9 @@
     }
   },
   "apiDir": "./app/api",
-  "schemaDir": "./types",
+  "schemaDir": "./app/api",
   "schemaType": "typescript",
-  "docsUrl": "api-docs",
+  "docsUrl": "docs",
   "ui": "scalar",
   "outputFile": "openapi.json",
   "includeOpenApiRoutes": false,
