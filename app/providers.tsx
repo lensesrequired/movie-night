@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 import themeVals from '../material-theme.json';
 
 const theme = createTheme({
@@ -13,5 +14,10 @@ const theme = createTheme({
 });
 
 export function Providers({ children }: { children: ReactNode }) {
-  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {children}
+    </ThemeProvider>
+  );
 }
