@@ -19,6 +19,8 @@ type PickContextType = {
   setExpiryOptions: (expiryOptions: PickExpiryOptions) => void;
   existingPick?: WatchlistPick;
   pickedMovie?: WatchlistMovie;
+  votes?: string[];
+  setVotes: (votes: string[]) => void;
 };
 
 const Context = createContext<PickContextType | undefined>(undefined);
@@ -45,6 +47,7 @@ export const PickProvider = ({
     count: 1,
     type: DurationOption.WEEK,
   });
+  const [votes, setVotes] = useState<string[]>();
 
   useEffect(() => {
     setPickName(existingPick?.name || '');
@@ -67,6 +70,8 @@ export const PickProvider = ({
         setExpiryOptions,
         existingPick,
         pickedMovie,
+        votes,
+        setVotes,
       }}
     >
       {children}

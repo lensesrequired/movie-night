@@ -1,4 +1,4 @@
-import { usePickContext } from '@/components/movie/pick/Context';
+import { usePickContext } from '@/components/pick/Context';
 import { apiFetch } from '@/helpers/fetch';
 import { ReactNode, useRef, useState } from 'react';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';

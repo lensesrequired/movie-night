@@ -1,5 +1,5 @@
-import { PickProvider } from '@/components/movie/pick/Context';
-import { Modal as PickModal } from '@/components/movie/pick/Modal';
+import { PickProvider } from '@/components/pick/Context';
+import { Modal as PickModal } from '@/components/pick/modal';
 import { PickOption, pickOptions } from '@/constants';
 import { apiFetch } from '@/helpers/fetch';
 import { timeBetweenDates } from '@/helpers/time';
@@ -51,12 +51,17 @@ export const PickDropdown = ({
     setOpen(false);
   };
 
-  const retrievePicks = async () => {
+  const retrievePicks = async (pickName?: string) => {
     setIsLoading(true);
     apiFetch(`/api/watchlist/${watchlistId}/picks`).then(
       ({ ok, data, error }) => {
         if (ok && data.picks) {
           setPicks(data.picks);
+          if (data.picks.length && pickName) {
+            setExistingPick(
+              data.picks.find((p: WatchlistPick) => p.name === pickName),
+            );
+          }
         } else {
           setError(error || 'Something went wrong. Please try again.');
         }
