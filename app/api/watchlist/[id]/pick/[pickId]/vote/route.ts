@@ -1,10 +1,70 @@
 import { PickOption } from '@/constants';
-import { createParams, dbclient, simplifyItem } from '@/server/dynamodb';
+import {
+  createParams,
+  dbclient,
+  parseItemsArray,
+  simplifyItem,
+} from '@/server/dynamodb';
 import { checkHasAccess } from '@/server/watchlist';
 import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { NextRequest, NextResponse } from 'next/server';
 
 type VoteParams = { id: string; pickId: string };
+
+/**
+ * Endpoint to retrieve pick votes
+ * @pathParams VoteParams
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<VoteParams> },
+) {
+  const { username } = JSON.parse(
+    decodeURIComponent(request.cookies.get('info')?.value || '{}'),
+  );
+  const { id, pickId } = await params;
+
+  if (!(await checkHasAccess(id, username))) {
+    return NextResponse.json(
+      { _message: 'Watchlist does not exist or you do not have access' },
+      { status: 403 },
+    );
+  }
+
+  return dbclient
+    .send(
+      new QueryCommand(
+        createParams({
+          Limit: 3,
+          KeyConditionExpression: 'PK = :userId AND SK = :votePickPrefix',
+          ExpressionAttributeValues: {
+            ':userId': { S: `USER#${username}` },
+            ':votePickPrefix': { S: `PICK#${pickId}` },
+          },
+        }),
+      ),
+    )
+    .then((response) => {
+      if (response.Items) {
+        return NextResponse.json({
+          votes: parseItemsArray(response.Items),
+        });
+      }
+
+      console.log(`vote lookup for ${id}:${pickId} failed`, response);
+      return NextResponse.json(
+        { _message: 'Something went wrong. Please try again later' },
+        { status: 500 },
+      );
+    })
+    .catch((err) => {
+      console.log(`vote lookup for ${id}:${pickId} failed`, err);
+      return NextResponse.json(
+        { _message: 'Something went wrong. Please try again later' },
+        { status: 500 },
+      );
+    });
+}
 
 /**
  * Endpoint to submit a pick vote

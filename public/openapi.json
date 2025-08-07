@@ -571,6 +571,42 @@
       }
     },
     "/watchlist/{id}/pick/{pickId}/vote": {
+      "get": {
+        "operationId": "get-watchlist-{id}-pick-{pickId}-vote",
+        "summary": "Endpoint to retrieve pick votes",
+        "description": "",
+        "tags": [
+          "Watchlist"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "123"
+          },
+          {
+            "in": "path",
+            "name": "pickId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "123"
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
       "post": {
         "operationId": "post-watchlist-{id}-pick-{pickId}-vote",
         "summary": "Endpoint to submit a pick vote",
