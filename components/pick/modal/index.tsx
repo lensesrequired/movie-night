@@ -1,6 +1,7 @@
 import { usePickContext } from '@/components/pick/Context';
 import { CreateForm } from '@/components/pick/modal/CreateForm';
 import { PickedMovie } from '@/components/pick/modal/PickedMovie';
+import { SubmittedVotes } from '@/components/pick/modal/SubmittedVotes';
 import { VoteForm } from '@/components/pick/modal/VoteForm';
 import { PickOption } from '@/constants';
 import { apiFetch } from '@/helpers/fetch';
@@ -95,7 +96,14 @@ export const Modal = ({ onClose, watchlistId, ...props }: PickModalProps) => {
       );
     }
     if (formPage === FormPage.SUBMITTED_VOTES) {
-      return <div>Your votes have been submitted!</div>;
+      return (
+        <SubmittedVotes
+          {...props}
+          onClose={onClose}
+          watchlistId={watchlistId}
+          setFormPage={setFormPage}
+        />
+      );
     }
     return (
       <CreateForm

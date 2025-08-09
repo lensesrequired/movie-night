@@ -36,7 +36,8 @@ export async function GET(
       new QueryCommand(
         createParams({
           Limit: 3,
-          KeyConditionExpression: 'PK = :userId AND SK = :votePickPrefix',
+          KeyConditionExpression:
+            'PK = :userId AND begins_with(SK, :votePickPrefix)',
           ExpressionAttributeValues: {
             ':userId': { S: `USER#${username}` },
             ':votePickPrefix': { S: `PICK#${pickId}` },
@@ -46,8 +47,9 @@ export async function GET(
     )
     .then((response) => {
       if (response.Items) {
+        // TODO: sort on SK before map to get the rank correct
         return NextResponse.json({
-          votes: parseItemsArray(response.Items),
+          votes: parseItemsArray(response.Items).map((item) => item.movie),
         });
       }
 
@@ -70,7 +72,7 @@ export async function GET(
  * Endpoint to submit a pick vote
  * @pathParams VoteParams
  */
-export async function POST(
+export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<VoteParams> },
 ) {
@@ -118,55 +120,33 @@ export async function POST(
 
         return dbclient
           .send(
-            new QueryCommand(
+            new PutItemCommand(
               createParams({
-                Limit: 1,
-                KeyConditionExpression: 'PK = :userId AND SK = :votePickPrefix',
-                ExpressionAttributeValues: {
-                  ':userId': { S: `USER#${username}` },
-                  ':votePickPrefix': { S: `PICK#${pickId}` },
+                Item: {
+                  PK: { S: `USER#${username}` },
+                  SK: { S: `PICK#${pickId}#VOTE#0` },
+                  movie: { S: votes[0] },
+                  ttl: { N: pick.ttl.toString() },
                 },
               }),
             ),
           )
           .then((response) => {
-            if (response.Items && response.Items.length > 0) {
-              return NextResponse.json(
-                { _message: 'Pick can only be voted on once' },
-                { status: 400 },
-              );
+            if (response.$metadata.httpStatusCode === 200) {
+              return NextResponse.json({ success: true });
             }
 
-            return dbclient
-              .send(
-                new PutItemCommand(
-                  createParams({
-                    Item: {
-                      PK: { S: `USER#${username}` },
-                      SK: { S: `PICK#${pickId}#VOTE#${votes[0]}` },
-                      rank: { N: '0' },
-                      ttl: { N: pick.ttl.toString() },
-                    },
-                  }),
-                ),
-              )
-              .then((response) => {
-                if (response.$metadata.httpStatusCode === 200) {
-                  return NextResponse.json({ success: true });
-                }
-
-                console.log(`vote submission for ${id}:${pickId}`, response);
-                return NextResponse.json({
-                  _message: 'Something went wrong. Please try again later',
-                });
-              })
-              .catch((err) => {
-                console.log(`vote submission for ${id}:${pickId}`, err);
-                return NextResponse.json(
-                  { _message: 'Something went wrong. Please try again later' },
-                  { status: 500 },
-                );
-              });
+            console.log(`vote submission for ${id}:${pickId}`, response);
+            return NextResponse.json({
+              _message: 'Something went wrong. Please try again later',
+            });
+          })
+          .catch((err) => {
+            console.log(`vote submission for ${id}:${pickId}`, err);
+            return NextResponse.json(
+              { _message: 'Something went wrong. Please try again later' },
+              { status: 500 },
+            );
           });
       }
 

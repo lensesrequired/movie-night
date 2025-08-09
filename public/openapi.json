@@ -607,8 +607,8 @@
           }
         }
       },
-      "post": {
-        "operationId": "post-watchlist-{id}-pick-{pickId}-vote",
+      "put": {
+        "operationId": "put-watchlist-{id}-pick-{pickId}-vote",
         "summary": "Endpoint to submit a pick vote",
         "description": "",
         "tags": [

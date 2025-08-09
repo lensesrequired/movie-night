@@ -61,16 +61,17 @@ export const VoteForm = ({
 
   const onSubmit = async () => {
     setIsLoading(true);
+    const moviesIds = votes
+      .filter((v) => v)
+      .map((t) => movies.find(({ title }) => title === t)?.tmdbId || '');
     apiFetch(`/api/watchlist/${watchlistId}/pick/${existingPick?.name}/vote`, {
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify({
-        votes: votes
-          .filter((v) => v)
-          .map((t) => movies.find(({ title }) => title === t)?.tmdbId),
+        votes: moviesIds,
       }),
     }).then(({ ok, data, error }) => {
       if (ok && data.success) {
-        setSubmittedVotes(votes.filter((v) => v));
+        setSubmittedVotes(moviesIds);
         setFormPage(FormPage.SUBMITTED_VOTES);
       } else {
         setError(error || 'Something went wrong. Please try again.');
