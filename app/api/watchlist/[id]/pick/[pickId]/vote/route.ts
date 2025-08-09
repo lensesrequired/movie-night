@@ -1,12 +1,13 @@
 import { PickOption } from '@/constants';
 import {
+  TABLE_NAME,
   createParams,
   dbclient,
   parseItemsArray,
   simplifyItem,
 } from '@/server/dynamodb';
 import { checkHasAccess } from '@/server/watchlist';
-import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { BatchWriteItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { NextRequest, NextResponse } from 'next/server';
 
 type VoteParams = { id: string; pickId: string };
@@ -120,16 +121,20 @@ export async function PUT(
 
         return dbclient
           .send(
-            new PutItemCommand(
-              createParams({
-                Item: {
-                  PK: { S: `USER#${username}` },
-                  SK: { S: `PICK#${pickId}#VOTE#0` },
-                  movie: { S: votes[0] },
-                  ttl: { N: pick.ttl.toString() },
-                },
-              }),
-            ),
+            new BatchWriteItemCommand({
+              RequestItems: {
+                [TABLE_NAME]: votes.map((tmdbId: string, i: number) => ({
+                  PutRequest: {
+                    Item: {
+                      PK: { S: `USER#${username}` },
+                      SK: { S: `PICK#${pickId}#VOTE#${i}` },
+                      movie: { S: tmdbId },
+                      ttl: { N: pick.ttl.toString() },
+                    },
+                  },
+                })),
+              },
+            }),
           )
           .then((response) => {
             if (response.$metadata.httpStatusCode === 200) {

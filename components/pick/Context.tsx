@@ -55,6 +55,7 @@ export const PickProvider = ({
       existingPick?.pickType || defaultPickType || PickOption.RANDOM_SELECTION,
     );
     setMoviePool(existingPick?.moviePool || MoviePoolOption.ALL_MOVIES);
+    setVotes(undefined);
   }, [defaultPickType, existingPick]);
 
   return (

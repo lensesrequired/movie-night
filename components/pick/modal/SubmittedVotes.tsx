@@ -63,30 +63,39 @@ export const SubmittedVotes = ({
         >
           {error && <Alert severity="error">{error}</Alert>}
           You have submitted your vote!
-          {voteMovies?.map((movie, i) => {
-            if (movie) {
-              return (
-                <Box
-                  key={`vote-movie-${i}`}
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                  }}
-                >
-                  <PosterDisplay
-                    src={`https://image.tmdb.org/t/p/w500/${movie.posterPath}`}
-                    altTitle={`${movie.title} Poster`}
-                  />
-                  <h3>
-                    {movie.title}
-                    {movie.releaseDate &&
-                      ` (${new Date(movie.releaseDate).toLocaleDateString()})`}
-                  </h3>
-                </Box>
-              );
-            }
-          })}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: '1rem',
+            }}
+          >
+            {voteMovies?.map((movie, i) => {
+              if (movie) {
+                return (
+                  <Box
+                    key={`vote-movie-${i}`}
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <PosterDisplay
+                      src={`https://image.tmdb.org/t/p/w500/${movie.posterPath}`}
+                      altTitle={`${movie.title} Poster`}
+                    />
+                    <h3>
+                      {movie.title}
+                      {movie.releaseDate &&
+                        ` (${new Date(movie.releaseDate).toLocaleDateString()})`}
+                    </h3>
+                  </Box>
+                );
+              }
+            })}
+          </Box>
         </Box>
       </DialogContent>
       <DialogActions>
