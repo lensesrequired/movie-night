@@ -63,7 +63,7 @@ export const VoteForm = ({
     setIsLoading(true);
     apiFetch(`/api/watchlist/${watchlistId}/pick/${existingPick?.name}/vote`, {
       method: 'POST',
-      body: JSON.stringify({ votes: [] }),
+      body: JSON.stringify({ votes: votes.filter((v) => v) }),
     }).then(({ ok, data, error }) => {
       if (ok && data.success) {
         setSubmittedVotes(votes.filter((v) => v));

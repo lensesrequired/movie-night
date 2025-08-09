@@ -42,6 +42,12 @@ export const Modal = ({ onClose, watchlistId, ...props }: PickModalProps) => {
   );
 
   useEffect(() => {
+    if (votes?.length) {
+      setFormPage(FormPage.SUBMITTED_VOTES);
+    }
+  }, [votes?.length]);
+
+  useEffect(() => {
     if (existingPick && votes === undefined) {
       setIsLoading(true);
       apiFetch(
@@ -87,6 +93,9 @@ export const Modal = ({ onClose, watchlistId, ...props }: PickModalProps) => {
           setFormPage={setFormPage}
         />
       );
+    }
+    if (formPage === FormPage.SUBMITTED_VOTES) {
+      return <div>{JSON.stringify(votes)}</div>;
     }
     return (
       <CreateForm

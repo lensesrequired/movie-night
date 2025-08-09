@@ -116,7 +116,7 @@ export async function POST(
           );
         }
 
-        dbclient
+        return dbclient
           .send(
             new QueryCommand(
               createParams({
@@ -137,7 +137,7 @@ export async function POST(
               );
             }
 
-            dbclient
+            return dbclient
               .send(
                 new PutItemCommand(
                   createParams({
@@ -145,7 +145,7 @@ export async function POST(
                       PK: { S: `USER#${username}` },
                       SK: { S: `PICK#${pickId}#VOTE#${votes[0]}` },
                       rank: { N: '0' },
-                      ttl: { N: pick.expiry.toString() },
+                      ttl: { N: pick.ttl.toString() },
                     },
                   }),
                 ),
