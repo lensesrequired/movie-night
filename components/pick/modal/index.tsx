@@ -95,7 +95,7 @@ export const Modal = ({ onClose, watchlistId, ...props }: PickModalProps) => {
       );
     }
     if (formPage === FormPage.SUBMITTED_VOTES) {
-      return <div>{JSON.stringify(votes)}</div>;
+      return <div>Your votes have been submitted!</div>;
     }
     return (
       <CreateForm
