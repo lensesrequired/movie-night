@@ -16,6 +16,10 @@ export enum PickOption {
   VOTING_RANKED = 'VOTING_RANKED',
 }
 
+export enum PickOperation {
+  CLOSE_VOTING = 'CLOSE_VOTING',
+}
+
 export const pickOptions = [
   { text: 'Random Selection', value: PickOption.RANDOM_SELECTION },
   { text: 'Voting (standard)', value: PickOption.VOTING_STANDARD },

@@ -1,6 +1,7 @@
 import { PosterDisplay } from '@/components/movie/PosterDisplay';
 import { usePickContext } from '@/components/pick/Context';
 import { FormPage } from '@/components/pick/modal/index';
+import { PickOperation } from '@/constants';
 import { apiFetch } from '@/helpers/fetch';
 import { WatchlistMovie } from '@/types';
 import { useMemo, useState } from 'react';
@@ -25,7 +26,7 @@ export const SubmittedVotes = ({
   movies,
   setFormPage,
 }: SubmittedVotesProps) => {
-  const { existingPick, votes } = usePickContext();
+  const { pickName, votes } = usePickContext();
   console.log(votes);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -37,11 +38,12 @@ export const SubmittedVotes = ({
 
   const onSubmit = async () => {
     setIsLoading(true);
-    //TODO: switch to vote counting
-    apiFetch(`/api/watchlist/${watchlistId}/pick/${existingPick?.name}/vote`, {
-      method: 'POST',
-      body: JSON.stringify({}),
-    }).then(({ ok, data, error }) => {
+    apiFetch(
+      `/api/watchlist/${watchlistId}/pick/${encodeURIComponent(pickName)}?operation=${PickOperation.CLOSE_VOTING}`,
+      {
+        method: 'POST',
+      },
+    ).then(({ ok, data, error }) => {
       if (ok && data.success) {
       } else {
         setError(error || 'Something went wrong. Please try again.');
@@ -67,7 +69,7 @@ export const SubmittedVotes = ({
             sx={{
               display: 'flex',
               flexDirection: 'row',
-              alignItems: 'center',
+              justifyContent: 'center',
               gap: '1rem',
             }}
           >
@@ -80,6 +82,7 @@ export const SubmittedVotes = ({
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
+                      textAlign: 'center',
                     }}
                   >
                     <PosterDisplay

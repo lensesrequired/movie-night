@@ -37,18 +37,19 @@ export async function GET(
       new QueryCommand(
         createParams({
           Limit: 3,
+          IndexName: 'GSI1',
           KeyConditionExpression:
-            'PK = :userId AND begins_with(SK, :votePickPrefix)',
+            'SK = :pickId AND begins_with(PK, :userPrefix)',
           ExpressionAttributeValues: {
-            ':userId': { S: `USER#${username}` },
-            ':votePickPrefix': { S: `PICK#${pickId}` },
+            ':pickId': { S: `PICK#${pickId}` },
+            ':userPrefix': { S: `USER#${username}` },
           },
         }),
       ),
     )
     .then((response) => {
       if (response.Items) {
-        // TODO: sort on SK before map to get the rank correct
+        // TODO: sort on PK before map to get the order correct
         return NextResponse.json({
           votes: parseItemsArray(response.Items).map((item) => item.movie),
         });
@@ -126,8 +127,8 @@ export async function PUT(
                 [TABLE_NAME]: votes.map((tmdbId: string, i: number) => ({
                   PutRequest: {
                     Item: {
-                      PK: { S: `USER#${username}` },
-                      SK: { S: `PICK#${pickId}#VOTE#${i}` },
+                      PK: { S: `USER#${username}#RANK#${i}` },
+                      SK: { S: `PICK#${pickId}` },
                       movie: { S: tmdbId },
                       ttl: { N: pick.ttl.toString() },
                     },
