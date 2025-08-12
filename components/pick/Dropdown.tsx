@@ -58,6 +58,7 @@ export const PickDropdown = ({
         if (ok && data.picks) {
           setPicks(data.picks);
           if (data.picks.length && pickName) {
+            console.log('picks', pickName);
             setExistingPick(
               data.picks.find((p: WatchlistPick) => p.name === pickName),
             );
@@ -75,6 +76,7 @@ export const PickDropdown = ({
   }, []);
 
   const pickedMovie = useMemo(() => {
+    console.log('existingPick', existingPick);
     if (movieLookup) {
       return movieLookup;
     }

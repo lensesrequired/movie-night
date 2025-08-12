@@ -43,6 +43,10 @@ export const Modal = ({ onClose, watchlistId, ...props }: PickModalProps) => {
   );
 
   useEffect(() => {
+    setPickedMovie(alreadyPickedMovie || null);
+  }, [alreadyPickedMovie]);
+
+  useEffect(() => {
     if (votes?.length) {
       setFormPage(FormPage.SUBMITTED_VOTES);
     }
