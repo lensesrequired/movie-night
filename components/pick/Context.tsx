@@ -36,7 +36,6 @@ export const PickProvider = ({
   existingPick?: WatchlistPick;
   pickedMovie?: WatchlistMovie;
 }) => {
-  console.log(pickedMovie);
   const [pickName, setPickName] = useState<string>(existingPick?.name || '');
   const [pickType, setPickType] = useState<PickOption>(
     existingPick?.pickType || defaultPickType || PickOption.RANDOM_SELECTION,
