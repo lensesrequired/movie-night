@@ -1,8 +1,17 @@
 import { PosterDisplay } from '@/components/movie/PosterDisplay';
+import { usePickContext } from '@/components/pick/Context';
 import { SaveDropdown } from '@/components/pick/SaveDropdown';
+import { PickOperation, PickOption } from '@/constants';
+import { apiFetch } from '@/helpers/fetch';
 import { WatchlistMovie } from '@/types';
 import { useState } from 'react';
-import { Alert, Box, DialogActions, DialogContent } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  DialogActions,
+  DialogContent,
+} from '@mui/material';
 
 type PickedMovieProps = {
   onClose: () => void;
@@ -19,7 +28,26 @@ export const PickedMovie = ({
   retrievePicks,
   pickedMovie,
 }: PickedMovieProps) => {
+  const { pickType, pickName } = usePickContext();
   const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const onSubmit = async () => {
+    setIsLoading(true);
+    apiFetch(
+      `/api/watchlist/${watchlistId}/pick/${encodeURIComponent(pickName)}?operation=${PickOperation.REOPEN_VOTING}`,
+      {
+        method: 'POST',
+      },
+    ).then(({ ok, error }) => {
+      if (ok) {
+        retrievePicks(pickName);
+      } else {
+        setError(error || 'Something went wrong. Please try again.');
+      }
+      setIsLoading(false);
+    });
+  };
 
   return (
     <>
@@ -58,6 +86,11 @@ export const PickedMovie = ({
         </Box>
       </DialogContent>
       <DialogActions>
+        {pickType !== PickOption.RANDOM_SELECTION && (
+          <Button variant="outlined" onClick={onSubmit} loading={isLoading}>
+            Reopen Voting
+          </Button>
+        )}
         <SaveDropdown
           closeModal={onClose}
           watchlistId={watchlistId}

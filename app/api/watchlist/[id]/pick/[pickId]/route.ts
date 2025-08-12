@@ -100,7 +100,7 @@ export async function POST(
               )
               .then((updateResponse) => {
                 if (updateResponse.$metadata.httpStatusCode === 200) {
-                  return NextResponse.json({ pickedMovie: winningMovieId });
+                  return NextResponse.json({ success: true });
                 }
 
                 console.log(
@@ -133,6 +133,41 @@ export async function POST(
         })
         .catch((err) => {
           console.log(`pick vote counting for ${id}:${pickId} failed`, err);
+          return NextResponse.json(
+            { _message: 'Something went wrong. Please try again later' },
+            { status: 500 },
+          );
+        });
+    case PickOperation.REOPEN_VOTING:
+      return dbclient
+        .send(
+          new UpdateItemCommand({
+            TableName: TABLE_NAME,
+            Key: {
+              PK: { S: `LIST#${id}` },
+              SK: { S: `PICK#${pickId}` },
+            },
+            UpdateExpression: `REMOVE #movie`,
+            ExpressionAttributeNames: {
+              '#movie': 'movie',
+            },
+          }),
+        )
+        .then((updateResponse) => {
+          if (updateResponse.$metadata.httpStatusCode === 200) {
+            return NextResponse.json({ success: true });
+          }
+
+          console.log(
+            `pick reopen vote for ${id}:${pickId} had bad response`,
+            updateResponse,
+          );
+          return NextResponse.json({
+            _message: 'Something went wrong. Please try again later',
+          });
+        })
+        .catch((err) => {
+          console.log(`pick reopen vote for ${id}:${pickId} failed`, err);
           return NextResponse.json(
             { _message: 'Something went wrong. Please try again later' },
             { status: 500 },

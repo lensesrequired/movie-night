@@ -18,6 +18,7 @@ export enum PickOption {
 
 export enum PickOperation {
   CLOSE_VOTING = 'CLOSE_VOTING',
+  REOPEN_VOTING = 'REOPEN_VOTING',
 }
 
 export const pickOptions = [
