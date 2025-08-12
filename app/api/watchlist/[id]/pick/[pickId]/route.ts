@@ -1,14 +1,24 @@
 import { PickOperation } from '@/constants';
-import { TABLE_NAME, createParams, dbclient } from '@/server/dynamodb';
+import { getRankedChoiceWinner } from '@/helpers/voting';
+import {
+  TABLE_NAME,
+  createParams,
+  dbclient,
+  parseItemsArray,
+} from '@/server/dynamodb';
 import { checkHasAccess } from '@/server/watchlist';
 import { QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { NextRequest, NextResponse } from 'next/server';
 
 type VoteParams = { id: string; pickId: string };
+// used for swagger generation
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type SearchParams = { operation: PickOperation };
 
 /**
- * Endpoint to submit a pick vote
+ * Endpoint to operate on a pick
  * @pathParams VoteParams
+ * @params SearchParams
  */
 export async function POST(
   request: NextRequest,
@@ -45,10 +55,32 @@ export async function POST(
         )
         .then((response) => {
           if (response && response.Items) {
-            // TODO: Ranked choice algorithm
-            return;
-            // Save winningMovieId and then return it
-            const winningMovieId = 'winningMovieId';
+            const votes = parseItemsArray(response.Items);
+            const accumulatedVotes = votes.reduce(
+              (acc: Record<string, Record<string, string>>, item) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const [_u, username, _r, rank] = item.PK.split('#');
+                if (!acc[username]) {
+                  acc[username] = {};
+                }
+                acc[username][rank] = item.movie;
+                return acc;
+              },
+              {},
+            );
+            const voteArrays = Object.values(accumulatedVotes).reduce(
+              (arrays, v) => {
+                const orderedVotes = [];
+                for (let i = 0; i < Object.keys(v).length; i++) {
+                  orderedVotes.push(v[i.toString()]);
+                }
+                arrays.push(orderedVotes);
+                return arrays;
+              },
+              [] as string[][],
+            );
+
+            const winningMovieId = getRankedChoiceWinner(voteArrays);
             return dbclient
               .send(
                 new UpdateItemCommand({

@@ -194,6 +194,7 @@ export const PickDropdown = ({
                               pickType,
                               expiresAt,
                               votingExpiresAt,
+                              movie,
                               ...rest
                             },
                             i,
@@ -205,7 +206,7 @@ export const PickDropdown = ({
                             let expiryText = expiresTime
                               ? `Expires in ${expiresTime}`
                               : 'Expired';
-                            if (votingExpiresAt) {
+                            if (votingExpiresAt && !movie) {
                               const votingExpiresTime = timeBetweenDates(
                                 new Date(),
                                 new Date(votingExpiresAt),
@@ -223,6 +224,7 @@ export const PickDropdown = ({
                                     pickType,
                                     expiresAt,
                                     votingExpiresAt,
+                                    movie,
                                     ...rest,
                                   });
                                 }}

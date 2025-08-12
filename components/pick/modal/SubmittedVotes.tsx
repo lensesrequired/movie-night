@@ -18,6 +18,7 @@ type SubmittedVotesProps = {
   watchlistId: string;
   movies: WatchlistMovie[];
   setFormPage: (page: FormPage) => void;
+  retrievePicks: (pickName?: string) => void;
 };
 
 export const SubmittedVotes = ({
@@ -25,9 +26,9 @@ export const SubmittedVotes = ({
   watchlistId,
   movies,
   setFormPage,
+  retrievePicks,
 }: SubmittedVotesProps) => {
   const { pickName, votes } = usePickContext();
-  console.log(votes);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
@@ -43,8 +44,9 @@ export const SubmittedVotes = ({
       {
         method: 'POST',
       },
-    ).then(({ ok, data, error }) => {
-      if (ok && data.success) {
+    ).then(({ ok, error }) => {
+      if (ok) {
+        retrievePicks(pickName);
       } else {
         setError(error || 'Something went wrong. Please try again.');
       }

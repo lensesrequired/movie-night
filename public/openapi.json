@@ -20,6 +20,13 @@
       }
     },
     "schemas": {
+      "SearchParams": {
+        "type": "object",
+        "properties": {
+          "operation": {}
+        }
+      },
+      "PickOperation": {},
       "VoteParams": {
         "type": "object",
         "properties": {
@@ -554,12 +561,18 @@
     "/watchlist/{id}/pick/{pickId}": {
       "post": {
         "operationId": "post-watchlist-{id}-pick-{pickId}",
-        "summary": "Endpoint to submit a pick vote",
+        "summary": "Endpoint to operate on a pick",
         "description": "",
         "tags": [
           "Watchlist"
         ],
         "parameters": [
+          {
+            "in": "query",
+            "name": "operation",
+            "schema": {},
+            "required": false
+          },
           {
             "in": "path",
             "name": "id",
