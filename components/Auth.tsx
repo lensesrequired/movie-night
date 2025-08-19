@@ -1,19 +1,29 @@
 'use client';
 
 import { apiFetch } from '@/helpers/fetch';
+import { useSearchParams } from 'next/navigation';
 import { FormEventHandler, useCallback, useEffect, useState } from 'react';
 import { Alert, Box, Button, TextField } from '@mui/material';
 
 type AuthProps = {
   createAccount?: boolean;
+  resetPassword?: boolean;
   redirectTo?: string;
 };
 
-export const Auth = ({ createAccount, redirectTo }: AuthProps) => {
+export const Auth = ({
+  createAccount,
+  resetPassword,
+  redirectTo,
+}: AuthProps) => {
+  const searchParams = useSearchParams();
+  const showResetSuccess = searchParams.get('resetSuccess') === 'true';
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [email, setEmail] = useState<string>('');
+  const [resetToken, setResetToken] = useState<string>('');
   const [usernameError, setUsernameError] = useState<string>('');
   const [emailError, setEmailError] = useState<string>('');
   const [submitError, setSubmitError] = useState<string>('');
@@ -50,10 +60,16 @@ export const Auth = ({ createAccount, redirectTo }: AuthProps) => {
         if (createAccount) {
           body.email = email;
         }
-        apiFetch(createAccount ? '/api/user' : '/api/authenticate', {
-          method: 'POST',
-          body: JSON.stringify(body),
-        }).then(({ ok, data, error }) => {
+        if (resetPassword) {
+          body.resetToken = resetToken;
+        }
+        apiFetch(
+          createAccount || resetPassword ? '/api/user' : '/api/authenticate',
+          {
+            method: resetPassword ? 'PUT' : 'POST',
+            body: JSON.stringify(body),
+          },
+        ).then(({ ok, data, error }) => {
           if (ok && data.authed) {
             if (createAccount) {
               window.location.assign(
@@ -62,6 +78,10 @@ export const Auth = ({ createAccount, redirectTo }: AuthProps) => {
             } else {
               window.location.reload();
             }
+          } else if (ok && data.success) {
+            window.location.assign(
+              `/?resetSuccess=true${redirectTo ? `&redirectTo=${encodeURIComponent(redirectTo)}` : ''}`,
+            );
           } else {
             setSubmitError(error || 'Something went wrong. Please try again.');
           }
@@ -72,13 +92,19 @@ export const Auth = ({ createAccount, redirectTo }: AuthProps) => {
   };
 
   const redirect = () => {
-    if (createAccount) {
+    if (createAccount || resetPassword) {
       window.location.assign(redirectTo || '/');
     } else {
       window.location.assign(
         `/signup${redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ''}`,
       );
     }
+  };
+
+  const goToReset = () => {
+    window.location.assign(
+      `/reset${redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ''}`,
+    );
   };
 
   return (
@@ -96,6 +122,11 @@ export const Auth = ({ createAccount, redirectTo }: AuthProps) => {
           sx={{ display: 'grid', gap: '1rem', flexGrow: 1, maxWidth: '30rem' }}
         >
           {submitError && <Alert severity="error">{submitError}</Alert>}
+          {showResetSuccess && (
+            <Alert severity="info">
+              Password reset successfully! Please login using your new password
+            </Alert>
+          )}
           {createAccount && (
             <TextField
               error={!!emailError}
@@ -106,6 +137,24 @@ export const Auth = ({ createAccount, redirectTo }: AuthProps) => {
               onChange={(e) => setEmail(e.target.value)}
               helperText={emailError}
             />
+          )}
+          {resetPassword && (
+            <>
+              <p>
+                Request a Reset Token by emailing{' '}
+                <a href="mailto:anna@lensesrequired.com">
+                  anna@lensesrequired.com
+                </a>{' '}
+                with your username and associated email
+              </p>
+              <TextField
+                id="resetToken"
+                label="Reset Token"
+                variant="outlined"
+                value={resetToken}
+                onChange={(e) => setResetToken(e.target.value)}
+              />
+            </>
           )}
           <TextField
             error={!!usernameError}
@@ -127,14 +176,28 @@ export const Auth = ({ createAccount, redirectTo }: AuthProps) => {
           <Button
             variant="contained"
             type="submit"
-            disabled={!username || !password || (createAccount && !email)}
+            disabled={
+              !username ||
+              !password ||
+              (createAccount && !email) ||
+              (resetPassword && !resetToken)
+            }
             loading={isLoading}
           >
-            {createAccount ? 'Create Account' : 'Login'}
+            {createAccount
+              ? 'Create Account'
+              : resetPassword
+                ? 'Update Password'
+                : 'Login'}
           </Button>
           <Button variant="outlined" onClick={redirect}>
-            {createAccount ? 'Back to Login' : 'Create Account'}
+            {createAccount || resetPassword
+              ? 'Back to Login'
+              : 'Create Account'}
           </Button>
+          {!createAccount && !resetPassword && (
+            <Button onClick={goToReset}>Reset Password</Button>
+          )}
         </Box>
       </Box>
     </form>
