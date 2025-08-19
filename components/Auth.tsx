@@ -67,6 +67,7 @@ export const Auth = ({ createAccount, redirectTo }: AuthProps) => {
           }
         });
       }
+      setIsLoading(false);
     }
   };
 
