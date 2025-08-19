@@ -20,6 +20,36 @@
       }
     },
     "schemas": {
+      "CreateResetBody": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "nullable": false
+          },
+          "password": {
+            "type": "string",
+            "nullable": false
+          }
+        }
+      },
+      "UpdateUserBody": {
+        "type": "object",
+        "properties": {
+          "resetToken": {
+            "type": "string",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": false
+          },
+          "password": {
+            "type": "string",
+            "nullable": false
+          }
+        }
+      },
       "SearchParams": {
         "type": "object",
         "properties": {
@@ -238,6 +268,84 @@
           "content": {
             "application/json": {
               "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "put": {
+        "operationId": "put-user",
+        "summary": "Endpoint to update a user",
+        "description": "",
+        "tags": [
+          "User"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resetToken": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "username": {
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "password": {
+                    "type": "string",
+                    "nullable": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/user/reset": {
+      "post": {
+        "operationId": "post-user-reset",
+        "summary": "Endpoint to create a reset token for a user",
+        "description": "",
+        "tags": [
+          "User"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "password": {
+                    "type": "string",
+                    "nullable": false
+                  }
+                }
+              }
             }
           }
         },

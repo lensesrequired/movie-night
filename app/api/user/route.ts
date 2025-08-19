@@ -1,8 +1,9 @@
-import { createParams, dbclient } from '@/server/dynamodb';
+import { createParams, dbclient, simplifyItem } from '@/server/dynamodb';
 import {
   GetItemCommand,
   PutItemCommand,
   QueryCommand,
+  UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import bcrypt from 'bcrypt';
 import { SerializeOptions, serialize } from 'cookie';
@@ -116,4 +117,98 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
+}
+
+type UpdateUserBody = {
+  resetToken?: string;
+  username: string;
+  password: string;
+};
+
+/**
+ * Endpoint to update a user
+ * @body UpdateUserBody
+ */
+export async function PUT(request: NextRequest) {
+  const { resetToken, username, password } =
+    (await request.json()) as UpdateUserBody;
+
+  if (!resetToken || !username || !password) {
+    return NextResponse.json(
+      { _message: 'resetToken, username, and password are required fields' },
+      { status: 400 },
+    );
+  }
+
+  return dbclient
+    .send(
+      new GetItemCommand(
+        createParams({
+          Key: {
+            PK: { S: `USER#${username}` },
+            SK: { S: '#RESET' },
+          },
+        }),
+      ),
+    )
+    .then(async (response) => {
+      if (response.Item) {
+        const { resetToken: savedResetToken } = simplifyItem(response.Item);
+        try {
+          const match = bcrypt.compareSync(resetToken, savedResetToken || '');
+          if (match) {
+            const salt = await bcrypt.genSalt();
+            const hashedPassword = await bcrypt.hash(password, salt);
+            return dbclient
+              .send(
+                new UpdateItemCommand(
+                  createParams({
+                    Key: {
+                      PK: { S: `USER#${username}` },
+                      SK: { S: '#PROFILE' },
+                    },
+                    UpdateExpression: `SET #password = :hashedPassword`,
+                    ExpressionAttributeNames: {
+                      '#password': 'password',
+                    },
+                    ExpressionAttributeValues: {
+                      ':hashedPassword': { S: hashedPassword },
+                    },
+                  }),
+                ),
+              )
+              .then(() => {
+                // TODO: remove reset token
+                return NextResponse.json({ success: true });
+              })
+              .catch((e) => {
+                console.log('account update', e);
+                return NextResponse.json(
+                  { _message: 'Account could not be updated' },
+                  { status: 500 },
+                );
+              });
+          }
+          return NextResponse.json(
+            { _message: 'Login failed' },
+            { status: 401 },
+          );
+        } catch (e) {
+          console.log('password check', e);
+          return NextResponse.json(
+            { _message: 'Login failed' },
+            { status: 401 },
+          );
+        }
+      }
+      return NextResponse.json(
+        { _message: 'User does not exist' },
+        { status: 404 },
+      );
+    })
+    .catch(async (err) => {
+      // log error
+      console.log('check user', err);
+      return NextResponse.json({ _message: 'Login failed' }, { status: 500 });
+    });
 }
