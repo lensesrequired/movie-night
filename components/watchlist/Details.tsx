@@ -12,9 +12,17 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Alert, Box, Button, Skeleton } from '@mui/material';
 import { WatchlistModal } from './Modal';
 
-type WatchlistDetailsProps = { id: string; username: string };
+type WatchlistDetailsProps = {
+  id: string;
+  username: string;
+  inviteCode?: string;
+};
 
-export function WatchlistDetails({ id, username }: WatchlistDetailsProps) {
+export function WatchlistDetails({
+  id,
+  username,
+  inviteCode,
+}: WatchlistDetailsProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMovies, setIsLoadingMovies] = useState(true);
   const [error, setError] = useState<string>('');
@@ -27,9 +35,13 @@ export function WatchlistDetails({ id, username }: WatchlistDetailsProps) {
 
   const retrieveWatchlist = () => {
     setIsLoading(true);
-    apiFetch(`/api/watchlist/${id}`).then(({ ok, data, error }) => {
+    apiFetch(`/api/watchlist/${id}`).then(({ ok, data, error, status }) => {
       if (ok && data.watchlist) {
         setWatchlist(data.watchlist);
+      } else if (status === 403) {
+        window.location.assign(
+          `join${inviteCode ? `?code=${encodeURIComponent(inviteCode)}` : ''}`,
+        );
       } else {
         setError(error || 'Something went wrong. Please try again.');
       }

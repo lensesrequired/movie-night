@@ -3,13 +3,13 @@ import { JoinForm } from '@/components/watchlist/JoinForm';
 import withAuth from '@/components/withAuth';
 import { AuthProps } from '@/types';
 
-async function JoinWatchlistPage({
+export async function JoinWatchlistPage({
   username,
   searchParams,
 }: {
-  searchParams: Promise<{ code: string | undefined }>;
+  searchParams?: Promise<{ code: string | undefined }>;
 } & AuthProps) {
-  const code = (await searchParams).code || '';
+  const code = (searchParams ? await searchParams : {}).code || '';
 
   if (username) {
     return <JoinForm defaultCode={code} />;
