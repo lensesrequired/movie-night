@@ -3,7 +3,7 @@ import { JoinForm } from '@/components/watchlist/JoinForm';
 import withAuth from '@/components/withAuth';
 import { AuthProps } from '@/types';
 
-export async function JoinWatchlistPage({
+async function JoinWatchlistPage({
   username,
   searchParams,
 }: {
