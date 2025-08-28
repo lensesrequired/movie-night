@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
           SK: inviteCodeKey,
           ttl: expiration,
         } = simplifyItem(response.Items[0]);
-        if (new Date(expiration) < new Date()) {
+        if (new Date(expiration * 1000) < new Date()) {
           return NextResponse.json(
             { _message: 'Expired Invite Code' },
             { status: 400 },
