@@ -142,8 +142,8 @@ export const Auth = ({
             <>
               <p>
                 Request a Reset Token by emailing{' '}
-                <a href="mailto:anna@lensesrequired.com">
-                  anna@lensesrequired.com
+                <a href="mailto:admin@lensesrequired.com">
+                  admin@lensesrequired.com
                 </a>{' '}
                 with your username and associated email
               </p>
