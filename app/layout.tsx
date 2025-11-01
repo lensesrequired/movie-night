@@ -2,7 +2,7 @@ import { Providers } from '@/app/providers';
 import { ProfileMenu } from '@/components/ProfileMenu';
 import { getAuth } from '@/components/withAuth';
 import type { Metadata } from 'next';
-import { Spectral } from 'next/font/google';
+import { Limelight, Spectral } from 'next/font/google';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import { Box, Link as MLink, Stack, Typography } from '@mui/material';
@@ -10,6 +10,11 @@ import Paper from '@mui/material/Paper';
 import './globals.scss';
 
 const spectral = Spectral({
+  weight: '400',
+  subsets: ['latin'],
+});
+
+const limelight = Limelight({
   weight: '400',
   subsets: ['latin'],
 });
@@ -40,7 +45,12 @@ async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
               }}
             >
               <Link href="/">
-                <h1>🍿 CineMates</h1>
+                <h1
+                  style={{ fontSize: '2.25rem' }}
+                  className={`${limelight.className}`}
+                >
+                  🍿 CineMates
+                </h1>
               </Link>
               {authProps.authed && <ProfileMenu {...authProps} />}
             </Paper>
