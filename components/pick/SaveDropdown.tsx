@@ -134,7 +134,10 @@ export const SaveDropdown = ({
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu" autoFocusItem>
                   {closeOptions.reduce((opts, { text, value }, i) => {
-                    if (!existingPick || i !== 1) {
+                    if (
+                      (existingPick || !pickName) &&
+                      value !== CloseOption.SAVE_AND_CLOSE
+                    ) {
                       opts.push(
                         <MenuItem
                           key={`close-option-${value}`}

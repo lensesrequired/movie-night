@@ -65,8 +65,8 @@ export const CreateForm = ({
   }, [moviePool, pickType]);
 
   useEffect(() => {
-    setDisabled(!pickName);
-  }, [pickName]);
+    setDisabled(!pickName && pickType !== PickOption.RANDOM_SELECTION);
+  }, [pickName, pickType]);
 
   const onSubmit = async () => {
     if (
@@ -118,16 +118,8 @@ export const CreateForm = ({
           }}
         >
           {error && <Alert severity="error">{error}</Alert>}
-          Enter a name for your Pick and choose a selection type.
-          {/*TODO: verify not in list already*/}
-          <TextField
-            id="name"
-            label="Pick Name"
-            variant="outlined"
-            value={pickName}
-            required
-            onChange={(e) => setPickName(e.target.value)}
-          />
+          For your pick, choose a selection method and enter a name if you want
+          to save the pick for later.
           <FormControl fullWidth>
             <InputLabel id="selection-method-select-label">
               Selection Method
@@ -148,6 +140,15 @@ export const CreateForm = ({
               ))}
             </Select>
           </FormControl>
+          {/*TODO: verify not in list already*/}
+          <TextField
+            id="name"
+            label="Pick Name"
+            variant="outlined"
+            value={pickName}
+            required={pickType !== PickOption.RANDOM_SELECTION}
+            onChange={(e) => setPickName(e.target.value)}
+          />
           {[PickOption.VOTING_STANDARD, PickOption.VOTING_RANKED].includes(
             pickType,
           ) && (
