@@ -574,6 +574,30 @@
             "$ref": "#/components/responses/500"
           }
         }
+      },
+      "patch": {
+        "operationId": "patch-watchlist-{id}-movie",
+        "summary": "Only handles updating the watched status of a movie for now",
+        "description": "",
+        "tags": [
+          "Watchlist"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
       }
     },
     "/watchlist/{id}/movies": {
