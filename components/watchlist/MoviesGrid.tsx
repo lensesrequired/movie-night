@@ -6,6 +6,7 @@ import { WatchlistMovie } from '@/types';
 import { MouseEvent, useState } from 'react';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Box, Button, Grid, Link, Skeleton } from '@mui/material';
 
 type MoviesGridProps = {
@@ -25,6 +26,7 @@ export const MoviesGrid = ({
 }: MoviesGridProps) => {
   const [selected, setSelected] = useState<number[]>([]);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   const onMovieClick = (e: MouseEvent, index: number) => {
     if ((e.target as Element).tagName.toLowerCase() !== 'a') {
@@ -56,6 +58,25 @@ export const MoviesGrid = ({
     });
   };
 
+  const onWatch = () => {
+    setIsUpdating(true);
+    const selectedMovie = movies[selected[0]];
+    apiFetch(`/api/watchlist/${watchlistId}/movie`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        movie: { ...selectedMovie, watched: !selectedMovie.watched },
+      }),
+    }).then(({ ok, data, error }) => {
+      if (ok && data.success) {
+        reloadMovies();
+        setSelected([]);
+      } else if (error) {
+        setError(error);
+      }
+      setIsUpdating(false);
+    });
+  };
+
   return (
     <Box sx={{ pt: 3, width: '100%' }}>
       {isLoading ? (
@@ -78,6 +99,14 @@ export const MoviesGrid = ({
           >
             Remove Movies
           </Button>
+          <Button
+            variant="outlined"
+            // color="error"
+            disabled={selected.length !== 1 || isUpdating}
+            onClick={onWatch}
+          >
+            Mark {movies?.[selected?.[0]]?.watched ? 'Unwatched' : 'Watched'}
+          </Button>
         </Box>
       )}
       <Grid id="movie-grid" container spacing={2} mt={1}>
@@ -92,7 +121,7 @@ export const MoviesGrid = ({
                   '& .movie-title': {
                     zIndex: '1000',
                   },
-                  '& .select-box': {
+                  '& .select-box,& .watched-box': {
                     width: '100%',
                     position: 'absolute',
                     top: '0',
@@ -113,8 +142,14 @@ export const MoviesGrid = ({
                       ml: 0.25,
                     },
                   },
+                  '&.watched': {
+                    opacity: 0.9,
+                  },
                 }}
-                className={selected.includes(index) ? 'selected' : ''}
+                className={
+                  (selected.includes(index) ? 'selected' : '') +
+                  (movie.watched ? ' watched' : '')
+                }
               >
                 <Box
                   sx={{
@@ -151,6 +186,25 @@ export const MoviesGrid = ({
                       />
                     )}
                   </Box>
+                  {movie.watched && (
+                    <Box
+                      sx={{
+                        display: 'absolute',
+                        textAlign: 'right',
+                        pt: 1.5,
+                        pr: 1.75,
+                      }}
+                      className="watched-box"
+                    >
+                      <CheckCircleIcon
+                        color="secondary"
+                        sx={{
+                          background:
+                            'radial-gradient(#555, #555, #555, transparent, transparent)',
+                        }}
+                      />
+                    </Box>
+                  )}
                   <Link
                     className="movie-title"
                     href={`https://www.themoviedb.org/movie/${movie.tmdbId}`}

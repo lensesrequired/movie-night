@@ -1,8 +1,17 @@
 import { MAX_MOVIES } from '@/constants';
-import { createParams, dbclient, simplifyItem } from '@/server/dynamodb';
+import {
+  TABLE_NAME,
+  createParams,
+  dbclient,
+  simplifyItem,
+} from '@/server/dynamodb';
 import { checkHasAccess } from '@/server/watchlist';
-import { TMDBMovieLookup } from '@/types';
-import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { TMDBMovieLookup, WatchlistMovie } from '@/types';
+import {
+  PutItemCommand,
+  QueryCommand,
+  UpdateItemCommand,
+} from '@aws-sdk/client-dynamodb';
 import { AttributeValue } from '@aws-sdk/client-dynamodb/dist-types/models/models_0';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -111,6 +120,61 @@ export async function PUT(
       console.log('watchlist add movie lookup', err);
       return NextResponse.json(
         { _message: 'Movie could not be added' },
+        { status: 500 },
+      );
+    });
+}
+
+// Only handles updating the watched status of a movie for now
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { username } = JSON.parse(
+    decodeURIComponent(request.cookies.get('info')?.value || '{}'),
+  );
+  const { id } = await params;
+
+  if (!(await checkHasAccess(id, username))) {
+    return NextResponse.json(
+      { _message: 'Watchlist does not exist or you do not have access' },
+      { status: 403 },
+    );
+  }
+
+  const { movie }: { movie: Partial<WatchlistMovie> } = await request.json();
+
+  if (!movie.tmdbId) {
+    return NextResponse.json(
+      { _message: 'Movie ID is required' },
+      { status: 400 },
+    );
+  }
+
+  return dbclient
+    .send(
+      new UpdateItemCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: { S: `MOVIE#${movie.tmdbId}` },
+          SK: { S: `LIST#${id}` },
+        },
+        UpdateExpression: `SET #watched = :watched`,
+        ExpressionAttributeNames: {
+          '#watched': 'watched',
+        },
+        ExpressionAttributeValues: {
+          ':watched': { BOOL: movie.watched || false },
+        },
+      }),
+    )
+    .then(() => {
+      return NextResponse.json({ success: true });
+    })
+    .catch((err) => {
+      console.log('watchlist update movie', err);
+      return NextResponse.json(
+        { _message: 'Movie could not be updated' },
         { status: 500 },
       );
     });

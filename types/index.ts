@@ -21,6 +21,7 @@ export type WatchlistMovie = {
   addedBy: string;
   releaseDate?: number;
   dateAdded: number;
+  watched?: boolean;
 };
 
 export type TMDBMovieLookup = {
