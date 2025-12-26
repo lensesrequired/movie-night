@@ -1,13 +1,11 @@
 'use client';
 
-import { MovieModal } from '@/components/movie/Modal';
 import { PickDropdown } from '@/components/pick/Dropdown';
 import { InviteCodeModal } from '@/components/watchlist/InviteCodeModal';
 import { MoviesGrid } from '@/components/watchlist/MoviesGrid';
 import { apiFetch } from '@/helpers/fetch';
 import { Watchlist, WatchlistMovie } from '@/types';
 import { useEffect, useState } from 'react';
-import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Alert, Box, Button, Skeleton } from '@mui/material';

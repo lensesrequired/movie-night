@@ -1,6 +1,5 @@
 import { MovieModal } from '@/components/movie/Modal';
 import { PosterDisplay } from '@/components/movie/PosterDisplay';
-import { PickDropdown } from '@/components/pick/Dropdown';
 import { MOVIE_POSTER_DIMENSIONS } from '@/constants';
 import { apiFetch } from '@/helpers/fetch';
 import { WatchlistMovie } from '@/types';
