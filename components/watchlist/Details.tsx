@@ -1,6 +1,7 @@
 'use client';
 
 import { MovieModal } from '@/components/movie/Modal';
+import { PickDropdown } from '@/components/pick/Dropdown';
 import { InviteCodeModal } from '@/components/watchlist/InviteCodeModal';
 import { MoviesGrid } from '@/components/watchlist/MoviesGrid';
 import { apiFetch } from '@/helpers/fetch';
@@ -29,7 +30,6 @@ export function WatchlistDetails({
   const [watchlist, setWatchlist] = useState<Watchlist>();
   const [movies, setMovies] = useState<WatchlistMovie[]>([]);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
-  const [showMovieModal, setShowMovieModal] = useState<boolean>(false);
   const [showInviteCodeModal, setShowInviteCodeModal] =
     useState<boolean>(false);
 
@@ -77,15 +77,6 @@ export function WatchlistDetails({
           defaults={watchlist}
         />
       )}
-      {showMovieModal && (
-        <MovieModal
-          watchlistId={id}
-          onClose={() => {
-            setShowMovieModal(false);
-          }}
-          onSuccess={retrieveMovies}
-        />
-      )}
       {showInviteCodeModal && (
         <InviteCodeModal
           watchlistId={id}
@@ -129,15 +120,11 @@ export function WatchlistDetails({
                     Invite
                   </Button>
                 )}
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={() => {
-                    setShowMovieModal(true);
-                  }}
-                >
-                  Add Movie
-                </Button>
+                <PickDropdown
+                  watchlistId={watchlist.id}
+                  reloadMovies={retrieveMovies}
+                  movies={movies}
+                />
               </Box>
             </Box>
             <Box color="text.secondary">

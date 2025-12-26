@@ -1,13 +1,18 @@
+import { MovieModal } from '@/components/movie/Modal';
 import { PosterDisplay } from '@/components/movie/PosterDisplay';
 import { PickDropdown } from '@/components/pick/Dropdown';
 import { MOVIE_POSTER_DIMENSIONS } from '@/constants';
 import { apiFetch } from '@/helpers/fetch';
 import { WatchlistMovie } from '@/types';
 import { MouseEvent, useState } from 'react';
+import AddIcon from '@mui/icons-material/Add';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { Box, Button, Grid, Link, Skeleton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Box, Button, Fab, Grid, Link, Skeleton } from '@mui/material';
 
 type MoviesGridProps = {
   isLoading?: boolean;
@@ -27,6 +32,7 @@ export const MoviesGrid = ({
   const [selected, setSelected] = useState<number[]>([]);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [showMovieModal, setShowMovieModal] = useState<boolean>(false);
 
   const onMovieClick = (e: MouseEvent, index: number) => {
     if ((e.target as Element).tagName.toLowerCase() !== 'a') {
@@ -79,36 +85,67 @@ export const MoviesGrid = ({
 
   return (
     <Box sx={{ pt: 3, width: '100%' }}>
-      {isLoading ? (
-        <Skeleton width="50%" height="2.5rem" />
-      ) : (
-        <Box sx={{ display: 'flex', gap: 1, p: 1 }}>
-          <PickDropdown
-            watchlistId={watchlistId}
-            reloadMovies={reloadMovies}
-            movies={movies}
-          />
-          <Button variant="outlined" onClick={onSelect}>
+      {showMovieModal && (
+        <MovieModal
+          watchlistId={watchlistId}
+          onClose={() => {
+            setShowMovieModal(false);
+          }}
+          onSuccess={reloadMovies}
+        />
+      )}
+      <Box
+        sx={{
+          display: 'flex',
+          position: 'fixed',
+          width: '100%',
+          bottom: 20,
+          zIndex: 1000,
+          justifyContent: 'center',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            backgroundColor: '#555',
+            padding: '8px',
+            borderRadius: 10,
+            gap: '10px',
+            alignItems: 'center',
+          }}
+        >
+          <Fab
+            color="primary"
+            aria-label="edit"
+            onClick={() => setShowMovieModal(true)}
+          >
+            <AddIcon />
+          </Fab>
+          <Fab variant="extended" onClick={onSelect}>
             {selected.length ? 'Unselect All' : 'Select All'}
-          </Button>
-          <Button
-            variant="outlined"
+          </Fab>
+          <Fab
             color="error"
-            disabled={selected.length === 0 || isDeleting}
+            aria-label="delete"
+            disabled={!selected.length || isDeleting}
             onClick={onRemove}
           >
-            Remove Movies
-          </Button>
-          <Button
-            variant="outlined"
-            // color="error"
+            <DeleteIcon />
+          </Fab>
+          <Fab
+            aria-label="select"
+            color="secondary"
             disabled={selected.length !== 1 || isUpdating}
             onClick={onWatch}
           >
-            Mark {movies?.[selected?.[0]]?.watched ? 'Unwatched' : 'Watched'}
-          </Button>
+            {movies?.[selected?.[0]]?.watched ? (
+              <VisibilityOffIcon />
+            ) : (
+              <VisibilityIcon />
+            )}
+          </Fab>
         </Box>
-      )}
+      </Box>
       <Grid id="movie-grid" container spacing={2} mt={1}>
         {(isLoading ? Array(6).fill(null) : movies).map((movie, index) => (
           <Grid key={`watchlist-${movie?.tmdbId || index}`}>
